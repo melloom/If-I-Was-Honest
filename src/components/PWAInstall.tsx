@@ -7,16 +7,25 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
 }
 
+const PWA_DISMISSED_KEY = 'pwa-install-dismissed'
+
 export function PWAInstall() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showPrompt, setShowPrompt] = useState(false)
 
   useEffect(() => {
+    // Check if user already dismissed in this session
+    const isDismissed = sessionStorage.getItem(PWA_DISMISSED_KEY) === 'true'
+    
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault()
       const beforeInstallPromptEvent = e as BeforeInstallPromptEvent
       setDeferredPrompt(beforeInstallPromptEvent)
-      setShowPrompt(true)
+      
+      // Only show if not dismissed in this session
+      if (!isDismissed) {
+        setShowPrompt(true)
+      }
     }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
@@ -45,6 +54,8 @@ export function PWAInstall() {
   }
 
   const handleDismiss = () => {
+    // Store dismissal in sessionStorage so it persists for this session only
+    sessionStorage.setItem(PWA_DISMISSED_KEY, 'true')
     setShowPrompt(false)
   }
 

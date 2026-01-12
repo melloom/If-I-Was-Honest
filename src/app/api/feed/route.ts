@@ -30,9 +30,10 @@ export async function GET(request: Request) {
     // Order by published date (most recent first) - must be after where clause
     query = query.orderBy('publishedAt', 'desc')
 
-    // Get all results first (we'll filter client-side for moods)
-    // Note: Firestore requires an index for where + orderBy queries, but deletedAt should be null for most entries
-    const snapshot = await query.limit(limit * 5).get() // Get more to account for filtering
+    // Get results - fetch more when filtering by mood to ensure enough results
+    // Mood filtering is done client-side since moods are stored as objects
+    const fetchLimit = (mood || search) ? Math.max(limit * 20, 500) : limit * 5
+    const snapshot = await query.limit(fetchLimit).get()
 
     let entries = snapshot.docs.map((doc: any) => {
       const data = doc.data()
