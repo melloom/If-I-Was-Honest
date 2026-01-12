@@ -162,10 +162,10 @@ function SignInContent() {
                 <button
                   type="submit"
                   disabled={resetLoading}
-                  className="w-full py-3 rounded-lg font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                  className="w-full py-3 rounded-lg font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity flex items-center justify-center min-h-[48px]"
                   style={{ backgroundColor: '#1A1A1A', color: '#FFFFFF' }}
                 >
-                  {resetLoading ? 'Sending...' : 'Send Reset Link'}
+                  <span className="truncate">{resetLoading ? 'Sending...' : 'Send Reset Link'}</span>
                 </button>
                 <button
                   type="button"
@@ -173,10 +173,10 @@ function SignInContent() {
                     setShowResetPassword(false)
                     setError('')
                   }}
-                  className="w-full py-3 rounded-lg font-medium hover:opacity-90 transition-opacity"
+                  className="w-full py-3 rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center justify-center min-h-[48px]"
                   style={{ backgroundColor: '#F5F3EF', color: '#1A1A1A', border: '1px solid #E8E4DC' }}
                 >
-                  Back to Sign In
+                  <span className="truncate">Back to Sign In</span>
                 </button>
               </div>
             </form>
@@ -242,10 +242,10 @@ function SignInContent() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 rounded-lg font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                className="w-full py-3 rounded-lg font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity flex items-center justify-center min-h-[48px]"
                 style={{ backgroundColor: '#1A1A1A', color: '#FFFFFF' }}
               >
-                {isLoading ? 'Signing in...' : 'Sign In'}
+                <span className="truncate">{isLoading ? 'Signing in...' : 'Sign In'}</span>
               </button>
             </form>
           )}

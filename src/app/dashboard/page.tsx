@@ -4,8 +4,26 @@ import DashboardClient from './DashboardClient'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'My Journal | If I Was Honest',
-  description: 'Your private journal space. Write honest thoughts, track your journey, and reflect on your growth.',
+  title: 'My Journal | TheHonestProject - Private Thoughts & Reflections',
+  description: 'Your private journal space. Write honest thoughts, unsent messages, and confessions. Track your emotional journey and reflect on your growth in a safe, anonymous space.',
+  keywords: [
+    'private journal',
+    'personal diary',
+    'mental health journaling',
+    'emotional reflection',
+    'anonymous writing',
+    'thought diary',
+    'personal growth',
+    'self-reflection',
+    'mindfulness journal',
+    'emotional wellness'
+  ],
+  openGraph: {
+    title: 'My Journal - TheHonestProject',
+    description: 'Your private space for honest thoughts and reflections.',
+    url: 'https://ifiiwashonest.com/dashboard',
+    type: 'website'
+  }
 }
 
 export default function DashboardPage() {

@@ -69,14 +69,17 @@ export async function PATCH(
     const userId = await getUserIdFromRequest(request)
 
     if (!userId) {
+      console.error('[Entry Update] Unauthorized: No userId from token')
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Unauthorized', message: 'Authentication required' },
         { status: 401 }
       )
     }
 
     const { id: entryId } = await context.params
     const { content, title, status } = await request.json()
+
+    console.log('[Entry Update] Request:', { userId, entryId, hasContent: !!content, hasTitle: !!title, status })
 
     const db = getServerFirestore()
     const entryRef = db.collection('entries').doc(userId).collection('entries').doc(entryId)
@@ -91,12 +94,46 @@ export async function PATCH(
 
     const entryData = entryDoc.data()
 
+    // SECURITY: Verify ownership
+    if (entryData?.userId && entryData.userId !== userId) {
+      console.warn('[Entry Update] Unauthorized update attempt', { 
+        entryId, 
+        entryUserId: entryData.userId, 
+        requestUserId: userId 
+      })
+      return NextResponse.json(
+        { error: 'Unauthorized: You do not own this entry' },
+        { status: 403 }
+      )
+    }
+
     // Check if soft deleted
     if (entryData?.deletedAt) {
       return NextResponse.json(
         { error: 'Entry not found' },
         { status: 404 }
       )
+    }
+
+    // SECURITY: Rate limit status changes (prevent rapid switching)
+    if (status !== undefined && entryData?.status !== status) {
+      const lastStatusChange = entryData?.lastStatusChangeAt?.toDate?.()
+      if (lastStatusChange) {
+        const timeSinceLastChange = Date.now() - lastStatusChange.getTime()
+        const cooldownPeriod = 10 * 1000 // 10 seconds cooldown
+        
+        if (timeSinceLastChange < cooldownPeriod) {
+          const remainingSeconds = Math.ceil((cooldownPeriod - timeSinceLastChange) / 1000)
+          return NextResponse.json(
+            { 
+              error: 'Status change rate limit',
+              message: `Please wait ${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''} before changing status again`,
+              remainingSeconds
+            },
+            { status: 429 }
+          )
+        }
+      }
     }
 
     // Validate status if provided
@@ -123,10 +160,51 @@ export async function PATCH(
 
     if (status !== undefined) {
       updateData.status = status
+      // Track when status was last changed (for rate limiting)
+      updateData.lastStatusChangeAt = new Date()
+      
+      // SECURITY: Log status change for audit trail
+      console.log('[Entry Update] Status change', {
+        entryId,
+        userId,
+        oldStatus: entryData?.status || 'STILL_TRUE',
+        newStatus: status,
+        timestamp: new Date().toISOString(),
+        isPublished: !!entryData?.publishedAt
+      })
     }
 
     // Update the entry
     await entryRef.update(updateData)
+
+    // If this entry is published, also update the published_entries collection
+    if (entryData?.publishedAt) {
+      const publishedEntryRef = db.collection('published_entries').doc(entryId)
+      const publishedDoc = await publishedEntryRef.get()
+      
+      if (publishedDoc.exists) {
+        // SECURITY: Double-check ownership in published collection
+        const publishedData = publishedDoc.data()
+        if (publishedData?.userId !== userId) {
+          console.error('[Entry Update] Ownership mismatch in published_entries', {
+            entryId,
+            publishedUserId: publishedData?.userId,
+            requestUserId: userId
+          })
+          return NextResponse.json(
+            { error: 'Unauthorized: Ownership verification failed' },
+            { status: 403 }
+          )
+        }
+        
+        await publishedEntryRef.update(updateData)
+        console.log('[Entry Update] Updated published_entries collection', {
+          entryId,
+          userId,
+          updatedFields: Object.keys(updateData)
+        })
+      }
+    }
 
     return NextResponse.json({
       success: true,

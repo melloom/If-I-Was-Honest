@@ -5,8 +5,9 @@ import AboutFooterCTADynamic from './AboutFooterCTADynamic'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'About If I Was Honest | Why We Write Honestly',
-  description: 'Learn about If I Was Honest—a safe space for anonymous thoughts and confessions. Discover our mission to help people express what they never said.',
+  title: 'About TheHonestProject | Anonymous Thoughts & Unsent Messages',
+  description: 'TheHonestProject (If I Was Honest) - A safe space for anonymous confessions, unsent messages, and honest thoughts you never said. Write what you truly feel without judgment.',
+  keywords: ['anonymous confessions', 'unsent messages', 'honest thoughts', 'private journal', 'mental health', 'anonymous thoughts', 'things i never said', 'confession app', 'honest feelings', 'emotional healing', 'therapy journal', 'anonymous writing', 'secret thoughts', 'unspoken words', 'mental wellness', 'self reflection'],
 }
 
 export default function AboutPage() {
@@ -19,8 +20,11 @@ export default function AboutPage() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-5xl md:text-6xl font-bold mb-6" style={{ color: '#1a1a1a', letterSpacing: '-0.02em' }}>
-            About If I Was Honest
+            About TheHonestProject
           </h1>
+          <p className="text-lg md:text-xl mb-2" style={{ color: '#9a9a9a' }}>
+            Also known as <span className="font-semibold" style={{ color: '#6a6a6a' }}>If I Was Honest</span>
+          </p>
           <p className="text-xl md:text-2xl" style={{ color: '#6a6a6a' }}>
             A space for the thoughts you'd never say out loud
           </p>
@@ -34,13 +38,23 @@ export default function AboutPage() {
             </h2>
             <div className="space-y-4" style={{ color: '#4a4a4a', lineHeight: '1.8', fontSize: '1.125rem' }}>
               <p>
-                We all have thoughts and feelings we're too afraid to share. Whether it's fear of judgment,
-                hurting someone, or just not wanting to burden others—these unsaid words weigh on us.
+                We all carry words we've never spoken. Thoughts too vulnerable to voice. Feelings too raw to share.
+                Messages we wish we'd sent, apologies we never made, truths we keep buried deep inside.
               </p>
               <p>
-                <strong>If I Was Honest</strong> gives you a safe space to let them out. Write honestly.
-                Reflect deeply. Grow authentically. And when you're ready, share your truth anonymously
-                to help others feel less alone.
+                Whether it's fear of judgment, not wanting to hurt someone, or simply the weight of being truly seen—
+                these unsaid words live within us, quietly shaping our lives and relationships.
+              </p>
+              <p>
+                <strong>TheHonestProject</strong> (also known as <strong>If I Was Honest</strong>) is a space designed for these unspoken truths. A place where you can 
+                write what you've always wanted to say but couldn't. Where honesty doesn't require courage, just words 
+                on a screen. Where your deepest thoughts can exist safely, privately, until you decide they're ready 
+                to be shared.
+              </p>
+              <p>
+                This is more than journaling—it's emotional archaeology. Digging through layers of what we think we 
+                should feel to find what we actually do. And when you're ready, your anonymous truth can help others 
+                realize they're not alone in theirs.
               </p>
             </div>
           </section>
@@ -138,14 +152,14 @@ export default function AboutPage() {
             <h2 className="text-3xl font-bold mb-6" style={{ color: '#1a1a1a' }}>
               Inspired By
             </h2>
-            <div className="space-y-4">
-              <p style={{ color: '#6a6a6a', lineHeight: '1.7' }}>
+            <div className="space-y-4" style={{ color: '#4a4a4a', lineHeight: '1.8', fontSize: '1.0625rem' }}>
+              <p>
                 This project was inspired by{' '}
                 <a 
                   href="https://theunsentproject.com" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="font-semibold hover:underline"
+                  className="font-semibold hover:underline transition-opacity hover:opacity-70"
                   style={{ color: '#2c2c2c' }}
                 >
                   The Unsent Project
@@ -153,10 +167,16 @@ export default function AboutPage() {
                 {' '}by Rora Blue—a powerful art project where people submit unsent text messages to their first love, 
                 each associated with a color. Their work beautifully captures the universal experience of words left unsaid.
               </p>
-              <p style={{ color: '#6a6a6a', lineHeight: '1.7' }}>
-                While The Unsent Project focuses on messages to first loves, If I Was Honest expands this concept 
-                to include all the honest thoughts we carry—to ourselves, to others, to the world. We're grateful 
-                for the inspiration to create a space where unspoken truths can finally be shared.
+              <p>
+                While The Unsent Project focuses on messages to first loves, <strong>TheHonestProject</strong> expands this concept 
+                to include all the honest thoughts we carry—to ourselves, to others, to the world. Messages to parents we 
+                never reconciled with. Apologies to friends we've lost. Truths we need to tell ourselves. Words we wish we 
+                could say to who we used to be.
+              </p>
+              <p>
+                We're deeply grateful to Rora Blue for pioneering this space of vulnerability and showing the world that 
+                our unsent words matter. Their vision inspired us to create a broader canvas where every unspoken truth 
+                can find a home.
               </p>
             </div>
           </section>
@@ -213,30 +233,101 @@ export default function AboutPage() {
               <svg className="w-8 h-8 flex-shrink-0" style={{ color: '#dc2626' }} fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
               </svg>
-              <div>
+              <div className="flex-1">
                 <h2 className="text-2xl font-bold mb-3" style={{ color: '#991b1b' }}>
                   Important: Crisis Resources
                 </h2>
-                <p className="mb-4" style={{ color: '#7f1d1d', lineHeight: '1.7' }}>
+                <p className="mb-6" style={{ color: '#7f1d1d', lineHeight: '1.7', fontSize: '1.0625rem' }}>
                   This platform is <strong>not a substitute</strong> for professional mental health care.
-                  If you're experiencing a crisis, please reach out to trained professionals immediately:
+                  If you're experiencing a crisis, having thoughts of suicide, or need immediate support, please reach out to trained professionals immediately:
                 </p>
-                <div className="space-y-2" style={{ color: '#7f1d1d' }}>
-                  <div className="flex items-start gap-2">
-                    <span className="font-semibold min-w-fit">988 Suicide & Crisis Lifeline:</span>
-                    <span>Call or text 988</span>
+                
+                <div className="grid md:grid-cols-2 gap-6 mb-6">
+                  {/* US Crisis Lines */}
+                  <div className="bg-white rounded-lg p-5 border" style={{ borderColor: '#fca5a5' }}>
+                    <h3 className="font-bold text-lg mb-3" style={{ color: '#991b1b' }}>
+                      United States
+                    </h3>
+                    <div className="space-y-3" style={{ color: '#7f1d1d', fontSize: '0.9375rem' }}>
+                      <div>
+                        <div className="font-semibold">988 Suicide & Crisis Lifeline</div>
+                        <div>Call or text: <span className="font-bold">988</span></div>
+                        <div className="text-sm opacity-75">24/7, free and confidential</div>
+                      </div>
+                      <div>
+                        <div className="font-semibold">Crisis Text Line</div>
+                        <div>Text <span className="font-bold">HOME</span> to <span className="font-bold">741741</span></div>
+                        <div className="text-sm opacity-75">24/7 crisis support via text</div>
+                      </div>
+                      <div>
+                        <div className="font-semibold">SAMHSA National Helpline</div>
+                        <div>Call: <span className="font-bold">1-800-662-4357</span></div>
+                        <div className="text-sm opacity-75">Treatment referral & information</div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <span className="font-semibold min-w-fit">Crisis Text Line:</span>
-                    <span>Text HOME to 741741</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="font-semibold min-w-fit">International:</span>
-                    <a href="https://www.iasp.info/resources/Crisis_Centres/" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80">
-                      IASP Crisis Centers Directory
-                    </a>
+
+                  {/* Specialized Resources */}
+                  <div className="bg-white rounded-lg p-5 border" style={{ borderColor: '#fca5a5' }}>
+                    <h3 className="font-bold text-lg mb-3" style={{ color: '#991b1b' }}>
+                      Specialized Support
+                    </h3>
+                    <div className="space-y-3" style={{ color: '#7f1d1d', fontSize: '0.9375rem' }}>
+                      <div>
+                        <div className="font-semibold">The Trevor Project (LGBTQ+ Youth)</div>
+                        <div>Call: <span className="font-bold">1-866-488-7386</span></div>
+                        <div>Text <span className="font-bold">START</span> to <span className="font-bold">678678</span></div>
+                      </div>
+                      <div>
+                        <div className="font-semibold">Trans Lifeline</div>
+                        <div>US: <span className="font-bold">1-877-565-8860</span></div>
+                        <div>Canada: <span className="font-bold">1-877-330-6366</span></div>
+                      </div>
+                      <div>
+                        <div className="font-semibold">Veterans Crisis Line</div>
+                        <div>Call: <span className="font-bold">988</span> then press <span className="font-bold">1</span></div>
+                        <div>Text: <span className="font-bold">838255</span></div>
+                      </div>
+                      <div>
+                        <div className="font-semibold">RAINN (Sexual Assault)</div>
+                        <div>Call: <span className="font-bold">1-800-656-4673</span></div>
+                      </div>
+                    </div>
                   </div>
                 </div>
+
+                {/* International Resources */}
+                <div className="bg-white rounded-lg p-5 border" style={{ borderColor: '#fca5a5' }}>
+                  <h3 className="font-bold text-lg mb-3" style={{ color: '#991b1b' }}>
+                    International Resources
+                  </h3>
+                  <div className="space-y-2" style={{ color: '#7f1d1d', fontSize: '0.9375rem' }}>
+                    <div className="flex items-start gap-2">
+                      <span className="font-semibold min-w-fit">Canada:</span>
+                      <span>Call 1-833-456-4566 or text 45645</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="font-semibold min-w-fit">UK:</span>
+                      <span>Call 116 123 (Samaritans)</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="font-semibold min-w-fit">Australia:</span>
+                      <span>Call 13 11 14 (Lifeline)</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="font-semibold min-w-fit">Worldwide:</span>
+                      <a href="https://findahelpline.com" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80 font-semibold">
+                        FindAHelpline.com
+                      </a>
+                      <span>- Crisis lines in 30+ countries</span>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="mt-6 text-sm" style={{ color: '#7f1d1d', lineHeight: '1.6' }}>
+                  <strong>Remember:</strong> Seeking help is a sign of strength, not weakness. You matter, and your feelings are valid.
+                  Professional support can make a real difference.
+                </p>
               </div>
             </div>
           </section>

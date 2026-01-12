@@ -74,6 +74,7 @@ export default function FeedClient() {
   const [typedText, setTypedText] = useState('')
   const fullText = "If I was honest..."
   const [isDesktop, setIsDesktop] = useState(false)
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState<string | null>(null) // Track which entry's dropdown is open
 
   // Set mounted to true after component mounts (client-side only)
   useEffect(() => {
@@ -150,6 +151,18 @@ export default function FeedClient() {
     window.addEventListener('resize', updateViewport)
     return () => window.removeEventListener('resize', updateViewport)
   }, [])
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (statusDropdownOpen) {
+        setStatusDropdownOpen(null)
+      }
+    }
+    
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [statusDropdownOpen])
 
   const fetchEntries = async (page: number = 1) => {
     console.log('[Feed] Fetching public feed entries for page', page)
@@ -274,6 +287,83 @@ export default function FeedClient() {
     }
   }
 
+  // Handle status change for owned entries
+  const handleStatusChange = async (entryId: string, newStatus: string) => {
+    try {
+      // Wait for token if not immediately available (retry up to 3 times)
+      let token = idToken
+      let retries = 0
+      while (!token && user && retries < 3) {
+        console.log(`[Feed] Token not ready, waiting... (attempt ${retries + 1}/3)`)
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        // Try to force refresh the token
+        if (user && !token) {
+          try {
+            const freshToken = await user.getIdToken(true)
+            token = freshToken
+            console.log('[Feed] Force refreshed token')
+          } catch (e) {
+            console.error('[Feed] Token refresh failed:', e)
+          }
+        } else {
+          token = idToken
+        }
+        retries++
+      }
+      
+      if (!token) {
+        console.error('[Feed] No auth token available after retries')
+        setErrorMessage('Authentication failed. Please refresh the page and try again.')
+        return
+      }
+
+      console.log('[Feed] Updating status:', { entryId, newStatus, hasToken: !!token })
+
+      const response = await fetch(`/api/entries/${entryId}`, {
+        method: 'PATCH',
+        headers: { 
+          'Content-Type': 'application/json', 
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: newStatus }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        const errorMessage = errorData.message || errorData.error || 'Failed to update status'
+        
+        if (response.status === 429) {
+          setErrorMessage(`Rate limit: ${errorMessage}`)
+        } else if (response.status === 401) {
+          setErrorMessage('Authentication expired. Please refresh the page.')
+        } else {
+          setErrorMessage(errorMessage)
+        }
+        
+        console.error('Status update failed:', errorMessage)
+        return
+      }
+
+      // Update local state
+      setEntries((prev) =>
+        prev.map((entry) =>
+          entry.id === entryId ? { ...entry, status: newStatus } : entry
+        )
+      )
+      
+      // Close dropdown
+      setStatusDropdownOpen(null)
+      
+      console.log('[Feed] Status updated successfully')
+    } catch (error) {
+      console.error('Error updating status:', error)
+      const errorMsg = error instanceof Error ? error.message : 'Failed to update status'
+      setErrorMessage(errorMsg)
+      setTimeout(() => setErrorMessage(null), 5000)
+    }
+  }
+
   // Generate consistent pastel color from entry ID
   const getCardColor = (entryId: string) => {
     const colors = [
@@ -385,18 +475,22 @@ export default function FeedClient() {
       {/* Feed Header Section */}
       <div className="max-w-4xl mx-auto px-4 py-6 border-b" style={{ borderColor: '#E8E4DC' }}>
         {/* App title */}
-        <h1
-          className="text-center text-3xl md:text-4xl font-bold mb-2"
-          style={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            letterSpacing: '-0.01em'
-          }}
-        >
-          The Honest Project
-        </h1>
+        <div className="flex items-center justify-center mb-2">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-0.5 bg-gradient-to-r from-transparent to-black/20"></div>
+            <h1
+              className="text-4xl md:text-5xl font-black text-center"
+              style={{
+                color: '#000000',
+                textShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                letterSpacing: '-0.02em'
+              }}
+            >
+              TheHonestProject
+            </h1>
+            <div className="w-12 h-0.5 bg-gradient-to-l from-transparent to-black/20"></div>
+          </div>
+        </div>
 
         {/* Typing animation subheader */}
         <p className="text-center text-xl md:text-2xl font-light mb-1 min-h-[2rem]" style={{ color: '#4a4a4a' }}>
@@ -569,7 +663,6 @@ export default function FeedClient() {
                 ? entry.content.substring(0, 120).trim()
                 : entry.content
               const hasMore = entry.content.length > 120
-              const recipientName = entry.to || 'Anonymous'
               const primaryMood = entry.moods[0]?.name || null
               const timeAgo = mounted ? formatTimeAgo(entry.publishedAt) : ''
               const cardColor = getCardColor(entry.id)
@@ -577,80 +670,817 @@ export default function FeedClient() {
               // Status badge (display only)
               const statusOption = STATUS_OPTIONS.find(s => s.value === entry.status) || STATUS_OPTIONS[0]
 
-              // Generate slight rotation for note effect
+              // Generate varied rotation for note effect (more visible)
               const getRotation = (id: string) => {
                 let hash = 0
                 for (let i = 0; i < id.length; i++) {
-                  hash = id.charCodeAt(i) + ((hash << 5) - hash)
+                  hash = (id.charCodeAt(i) + ((hash << 5) - hash)) | 0
                 }
-                // Random rotation between -2 and 2 degrees
-                return ((hash % 5) - 2)
+                // Random rotation between -5 and 5 degrees for MORE variety
+                const rotation = ((Math.abs(hash) % 100) - 50) / 10
+                return rotation
               }
+
+              // Generate MORE offset for scattered look
+              const getOffset = (id: string, axis: 'x' | 'y') => {
+                let hash = 0
+                for (let i = 0; i < id.length; i++) {
+                  hash = (id.charCodeAt(i) * (axis === 'x' ? 7 : 13) + ((hash << 3) - hash)) | 0
+                }
+                // Larger offset between -8px and 8px
+                return ((Math.abs(hash) % 17) - 8)
+              }
+
+              // Generate unique tape positions for each card - different locations
+              const getTapePosition = (id: string, side: 'left' | 'right') => {
+                let hash = 0
+                for (let i = 0; i < id.length; i++) {
+                  hash = (id.charCodeAt(i) * (side === 'left' ? 17 : 23) + ((hash << 4) - hash)) | 0
+                }
+                // Determine tape location: 0=top, 1=bottom, 2=left side, 3=right side
+                const location = Math.abs(hash) % 4
+                
+                // Random position along edge (10-30% from corner)
+                const position = 10 + (Math.abs(hash) % 21)
+                const rotation = ((Math.abs(hash) % 12) - 6) // -6 to +6 degrees
+                const width = 18 + (Math.abs(hash) % 10) // 18-28px base width
+                
+                return { 
+                  position: `${position}%`, 
+                  rotation, 
+                  width,
+                  location // 0=top, 1=bottom, 2=left, 3=right
+                }
+              }
+
+              // Generate better positioned creases - more natural placement
+              const getCreasePosition = (id: string, index: number) => {
+                let hash = 0
+                for (let i = 0; i < id.length; i++) {
+                  hash = (id.charCodeAt(i) * (index * 17) + ((hash << 6) - hash)) | 0
+                }
+                const absHash = Math.abs(hash)
+                
+                // Creases positioned more naturally across the card
+                // First crease: upper third (25-40%)
+                // Second crease: middle (45-65%)
+                const top = index === 1 ? 25 + (absHash % 16) : // 25-40%
+                           50 + (absHash % 16) // 50-65%
+                
+                // More varied horizontal positioning
+                const left = 2 + (absHash % 8) // 2-10% from left
+                const width = 80 + (absHash % 16) // 80-95% width
+                
+                // Slightly more varied rotation for natural look
+                const rotation = ((absHash % 8) - 4) / 2 // -2 to +2 degrees
+                
+                // Better opacity variation
+                const opacity = 0.6 + (absHash % 20) / 100 // 0.6-0.8
+                
+                return { top: `${top}%`, left: `${left}%`, width: `${width}%`, rotation, opacity }
+              }
+
+              // Generate paper rips based on post age
+              const getPaperRips = (id: string, publishedAt: string) => {
+                const now = new Date().getTime()
+                const postDate = new Date(publishedAt).getTime()
+                const ageInDays = (now - postDate) / (1000 * 60 * 60 * 24)
+                
+                let hash = 0
+                for (let i = 0; i < id.length; i++) {
+                  hash = (id.charCodeAt(i) * 31 + ((hash << 5) - hash)) | 0
+                }
+                const absHash = Math.abs(hash)
+                
+                // More rips for older posts
+                const ripCount = ageInDays < 7 ? 2 : ageInDays < 30 ? 3 : 4
+                const ripIntensity = Math.min(ageInDays / 365, 1) // 0-1 based on age up to 1 year
+                
+                // Generate random edge positions for rips - MUCH BIGGER
+                const rips = []
+                for (let i = 0; i < ripCount; i++) {
+                  const edgeHash = (absHash * (i + 1)) % 1000
+                  const edge = edgeHash % 4 // 0=top, 1=right, 2=bottom, 3=left
+                  const position = 10 + (edgeHash % 80) // 10-90% along edge
+                  const size = 15 + Math.floor(ripIntensity * 25) + (edgeHash % 15) // 15-55px based on age
+                  const depth = 6 + Math.floor(ripIntensity * 10) + (edgeHash % 8) // 6-24px
+                  rips.push({ edge, position, size, depth })
+                }
+                
+                return rips
+              }
+
+              // Generate unique crack pattern for each card
+              const getCrackPattern = (id: string) => {
+                let hash = 0
+                for (let i = 0; i < id.length; i++) {
+                  hash = (id.charCodeAt(i) * 41 + ((hash << 7) - hash)) | 0
+                }
+                const absHash = Math.abs(hash)
+                
+                // Main crack angle (varied between 90-150 degrees)
+                const mainAngle = 90 + (absHash % 61)
+                
+                // Branch crack angles (varied)
+                const branch1Angle = 140 + (absHash % 50)
+                const branch2Angle = 20 + ((absHash >> 2) % 70)
+                const branch3Angle = 80 + ((absHash >> 4) % 35)
+                
+                // Main crack opacity (much lighter: 0.15-0.35)
+                const mainOpacity = 0.15 + ((absHash % 21) / 100)
+                
+                // Branch crack opacities (very light: 0.08-0.22)
+                const branchOpacity1 = 0.08 + ((absHash % 15) / 100)
+                const branchOpacity2 = 0.07 + (((absHash >> 2) % 16) / 100)
+                const branchOpacity3 = 0.06 + (((absHash >> 4) % 15) / 100)
+                
+                // Micro fracture positions (varied)
+                const frac1X = 45 + (absHash % 20)
+                const frac1Y = 35 + (absHash % 30)
+                const frac2X = 50 + ((absHash >> 1) % 25)
+                const frac2Y = 40 + ((absHash >> 1) % 30)
+                const frac3X = 40 + ((absHash >> 2) % 30)
+                const frac3Y = 50 + ((absHash >> 2) % 25)
+                const frac4X = 35 + ((absHash >> 3) % 30)
+                const frac4Y = 45 + ((absHash >> 3) % 30)
+                
+                // Micro fracture opacities (much lighter: 0.04-0.12)
+                const fracOpacity1 = 0.04 + ((absHash % 9) / 100)
+                const fracOpacity2 = 0.03 + (((absHash >> 1) % 8) / 100)
+                const fracOpacity3 = 0.04 + (((absHash >> 2) % 9) / 100)
+                const fracOpacity4 = 0.03 + (((absHash >> 3) % 8) / 100)
+                
+                return {
+                  mainAngle,
+                  branch1Angle,
+                  branch2Angle,
+                  branch3Angle,
+                  mainOpacity,
+                  branchOpacity1,
+                  branchOpacity2,
+                  branchOpacity3,
+                  frac1X, frac1Y, frac2X, frac2Y, frac3X, frac3Y, frac4X, frac4Y,
+                  fracOpacity1, fracOpacity2, fracOpacity3, fracOpacity4
+                }
+              }
+
+              const rotation = getRotation(entry.id)
+              const offsetX = isDesktop ? getOffset(entry.id, 'x') : 0
+              const offsetY = isDesktop ? getOffset(entry.id, 'y') : 0
+              const leftTape = getTapePosition(entry.id, 'left')
+              const rightTape = getTapePosition(entry.id, 'right')
+              const crease1 = getCreasePosition(entry.id, 1)
+              const crease2 = getCreasePosition(entry.id, 2)
+              const paperRips = getPaperRips(entry.id, entry.publishedAt)
+              const crackPattern = getCrackPattern(entry.id)
 
               return (
                 <div
                   key={entry.id}
                   onClick={() => setSelectedEntry(entry)}
-                  className="relative p-6 cursor-pointer transition-all hover:scale-105 md:hover:rotate-0 hover:z-10"
+                  className="relative p-6 cursor-pointer transition-all duration-200 hover:scale-105 md:hover:rotate-0 hover:z-10 hover:shadow-2xl"
                   style={{
                     backgroundColor: cardColor,
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1)',
+                    boxShadow: `${offsetX}px ${Math.abs(offsetY) + 4}px 16px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08)`,
                     border: '1px solid rgba(0, 0, 0, 0.08)',
-                    borderRadius: '3px',
-                    transform: isDesktop ? `rotate(${getRotation(entry.id)}deg)` : 'none',
-                    // Add paper edge effect
+                    borderRadius: '2px',
+                    transform: isDesktop ? `rotate(${rotation}deg) translate(${offsetX}px, ${offsetY}px)` : 'none',
+                    // Add paper edge effect with slight irregularity
                     backgroundImage: `
                       linear-gradient(to right, rgba(0,0,0,0.03) 0%, transparent 1%, transparent 99%, rgba(0,0,0,0.03) 100%),
                       linear-gradient(to bottom, rgba(0,0,0,0.03) 0%, transparent 1%, transparent 99%, rgba(0,0,0,0.03) 100%)
                     `,
                   }}
                 >
+                  {/* BIGGER realistic tape - positioned differently on each card */}
+                  {/* Left tape */}
+                  {leftTape.location === 0 && ( // Top edge
+                    <div
+                      className="absolute pointer-events-none z-30"
+                      style={{
+                        top: '-8px',
+                        left: leftTape.position,
+                        width: `${leftTape.width + 20}px`,
+                        height: '24px',
+                        background: 'linear-gradient(135deg, rgba(255,240,120,0.75) 0%, rgba(255,230,95,0.85) 50%, rgba(255,240,120,0.75) 100%)',
+                        transform: `rotate(${leftTape.rotation}deg)`,
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.6), inset 0 -2px 0 rgba(0,0,0,0.15)',
+                        border: '1px solid rgba(210,190,50,0.5)',
+                        borderRadius: '2px',
+                        backdropFilter: 'blur(0.5px)',
+                      }}
+                    />
+                  )}
+                  {leftTape.location === 1 && ( // Bottom edge
+                    <div
+                      className="absolute pointer-events-none z-30"
+                      style={{
+                        bottom: '-8px',
+                        left: leftTape.position,
+                        width: `${leftTape.width + 20}px`,
+                        height: '24px',
+                        background: 'linear-gradient(135deg, rgba(255,240,120,0.75) 0%, rgba(255,230,95,0.85) 50%, rgba(255,240,120,0.75) 100%)',
+                        transform: `rotate(${leftTape.rotation}deg)`,
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.6), inset 0 -2px 0 rgba(0,0,0,0.15)',
+                        border: '1px solid rgba(210,190,50,0.5)',
+                        borderRadius: '2px',
+                        backdropFilter: 'blur(0.5px)',
+                      }}
+                    />
+                  )}
+                  {leftTape.location === 2 && ( // Left side
+                    <div
+                      className="absolute pointer-events-none z-30"
+                      style={{
+                        left: '-8px',
+                        top: leftTape.position,
+                        width: '24px',
+                        height: `${leftTape.width + 20}px`,
+                        background: 'linear-gradient(135deg, rgba(255,240,120,0.75) 0%, rgba(255,230,95,0.85) 50%, rgba(255,240,120,0.75) 100%)',
+                        transform: `rotate(${leftTape.rotation}deg)`,
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.6), inset 0 -2px 0 rgba(0,0,0,0.15)',
+                        border: '1px solid rgba(210,190,50,0.5)',
+                        borderRadius: '2px',
+                        backdropFilter: 'blur(0.5px)',
+                      }}
+                    />
+                  )}
+                  {leftTape.location === 3 && ( // Right side
+                    <div
+                      className="absolute pointer-events-none z-30"
+                      style={{
+                        right: '-8px',
+                        top: leftTape.position,
+                        width: '24px',
+                        height: `${leftTape.width + 20}px`,
+                        background: 'linear-gradient(135deg, rgba(255,240,120,0.75) 0%, rgba(255,230,95,0.85) 50%, rgba(255,240,120,0.75) 100%)',
+                        transform: `rotate(${leftTape.rotation}deg)`,
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.6), inset 0 -2px 0 rgba(0,0,0,0.15)',
+                        border: '1px solid rgba(210,190,50,0.5)',
+                        borderRadius: '2px',
+                        backdropFilter: 'blur(0.5px)',
+                      }}
+                    />
+                  )}
+                  
+                  {/* Right tape */}
+                  {rightTape.location === 0 && ( // Top edge
+                    <div
+                      className="absolute pointer-events-none z-30"
+                      style={{
+                        top: '-8px',
+                        right: rightTape.position,
+                        width: `${rightTape.width + 20}px`,
+                        height: '24px',
+                        background: 'linear-gradient(135deg, rgba(255,240,120,0.75) 0%, rgba(255,230,95,0.85) 50%, rgba(255,240,120,0.75) 100%)',
+                        transform: `rotate(${rightTape.rotation}deg)`,
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.6), inset 0 -2px 0 rgba(0,0,0,0.15)',
+                        border: '1px solid rgba(210,190,50,0.5)',
+                        borderRadius: '2px',
+                        backdropFilter: 'blur(0.5px)',
+                      }}
+                    />
+                  )}
+                  {rightTape.location === 1 && ( // Bottom edge
+                    <div
+                      className="absolute pointer-events-none z-30"
+                      style={{
+                        bottom: '-8px',
+                        right: rightTape.position,
+                        width: `${rightTape.width + 20}px`,
+                        height: '24px',
+                        background: 'linear-gradient(135deg, rgba(255,240,120,0.75) 0%, rgba(255,230,95,0.85) 50%, rgba(255,240,120,0.75) 100%)',
+                        transform: `rotate(${rightTape.rotation}deg)`,
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.6), inset 0 -2px 0 rgba(0,0,0,0.15)',
+                        border: '1px solid rgba(210,190,50,0.5)',
+                        borderRadius: '2px',
+                        backdropFilter: 'blur(0.5px)',
+                      }}
+                    />
+                  )}
+                  {rightTape.location === 2 && ( // Left side
+                    <div
+                      className="absolute pointer-events-none z-30"
+                      style={{
+                        left: '-8px',
+                        top: rightTape.position,
+                        width: '24px',
+                        height: `${rightTape.width + 20}px`,
+                        background: 'linear-gradient(135deg, rgba(255,240,120,0.75) 0%, rgba(255,230,95,0.85) 50%, rgba(255,240,120,0.75) 100%)',
+                        transform: `rotate(${rightTape.rotation}deg)`,
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.6), inset 0 -2px 0 rgba(0,0,0,0.15)',
+                        border: '1px solid rgba(210,190,50,0.5)',
+                        borderRadius: '2px',
+                        backdropFilter: 'blur(0.5px)',
+                      }}
+                    />
+                  )}
+                  {rightTape.location === 3 && ( // Right side
+                    <div
+                      className="absolute pointer-events-none z-30"
+                      style={{
+                        right: '-8px',
+                        top: rightTape.position,
+                        width: '24px',
+                        height: `${rightTape.width + 20}px`,
+                        background: 'linear-gradient(135deg, rgba(255,240,120,0.75) 0%, rgba(255,230,95,0.85) 50%, rgba(255,240,120,0.75) 100%)',
+                        transform: `rotate(${rightTape.rotation}deg)`,
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.6), inset 0 -2px 0 rgba(0,0,0,0.15)',
+                        border: '1px solid rgba(210,190,50,0.5)',
+                        borderRadius: '2px',
+                        backdropFilter: 'blur(0.5px)',
+                      }}
+                    />
+                  )}
+                  
                   {/* Status badge */}
-                  <div className="absolute top-4 right-4">
-                    <span
-                      className="text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1.5"
-                      style={{ backgroundColor: statusOption.color, color: statusOption.textColor }}
-                      title={statusOption.label}
-                    >
-                      <span>{statusOption.emoji}</span>
-                      {statusOption.label}
-                    </span>
+                  <div 
+                    className="absolute top-4 right-4 z-20"
+                  >
+                    {entry.userId === user?.uid ? (
+                      // User owns this entry - make status clickable with dropdown
+                      <div 
+                        className="relative"
+                      >
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation() // Prevent modal from opening
+                            setStatusDropdownOpen(statusDropdownOpen === entry.id ? null : entry.id)
+                          }}
+                          className="text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1.5 transition-all hover:scale-105 hover:shadow-lg cursor-pointer"
+                          style={{ backgroundColor: statusOption.color, color: statusOption.textColor }}
+                          title="Click to change status"
+                        >
+                          <span>{statusOption.emoji}</span>
+                          {statusOption.label}
+                        </button>
+                        
+                        {/* Status dropdown menu */}
+                        {statusDropdownOpen === entry.id && (
+                          <div 
+                            className="absolute right-0 top-full w-48 rounded-lg shadow-xl border overflow-hidden z-50"
+                            style={{ backgroundColor: '#FFFFFF', borderColor: '#E0E0E0' }}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {STATUS_OPTIONS.map((status) => (
+                              <button
+                                key={status.value}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleStatusChange(entry.id, status.value)
+                                }}
+                                className="w-full px-4 py-2.5 text-left text-sm font-medium flex items-center gap-2 transition-all"
+                                style={{ 
+                                  backgroundColor: entry.status === status.value ? status.color : '#FFFFFF',
+                                  color: entry.status === status.value ? status.textColor : '#4A4A4A',
+                                  opacity: entry.status === status.value ? 1 : 0.9
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (entry.status !== status.value) {
+                                    e.currentTarget.style.backgroundColor = '#F5F5F5'
+                                  }
+                                }}
+                                onMouseLeave={(e) => {
+                                  if (entry.status !== status.value) {
+                                    e.currentTarget.style.backgroundColor = '#FFFFFF'
+                                  }
+                                }}
+                              >
+                                <span className="text-base">{status.emoji}</span>
+                                <span>{status.label}</span>
+                                {entry.status === status.value && (
+                                  <span className="ml-auto text-lg">✓</span>
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      // Not the owner - display only
+                      <span
+                        className="text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1.5"
+                        style={{ backgroundColor: statusOption.color, color: statusOption.textColor }}
+                        title={statusOption.label}
+                      >
+                        <span>{statusOption.emoji}</span>
+                        {statusOption.label}
+                      </span>
+                    )}
                   </div>
-                  {/* Paper texture overlay */}
+                  
+                  {/* Paper lighting - subtle gradient for depth and realism */}
                   <div
-                    className="absolute inset-0 pointer-events-none"
+                    className="absolute inset-0 pointer-events-none rounded-sm"
                     style={{
-                      backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E")`,
+                      background: 'radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.03) 100%)',
+                    }}
+                  />
+                  
+                  {/* MUCH MORE VISIBLE paper texture */}
+                  <div
+                    className="absolute inset-0 pointer-events-none rounded-sm"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' /%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E")`,
                       mixBlendMode: 'multiply',
                     }}
                   />
 
-                  {/* Top edge shadow (like folded paper) */}
+                  {/* Stronger worn edges */}
                   <div
-                    className="absolute top-0 left-0 right-0 h-1 pointer-events-none"
+                    className="absolute inset-0 pointer-events-none rounded-sm"
                     style={{
-                      background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), transparent)',
+                      boxShadow: 'inset 0 0 30px rgba(0,0,0,0.06), inset 0 0 5px rgba(0,0,0,0.08)',
+                    }}
+                  />
+
+                  {/* Top edge shadow - MORE VISIBLE */}
+                  <div
+                    className="absolute top-0 left-0 right-0 h-3 pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(to bottom, rgba(0,0,0,0.15), transparent)',
+                    }}
+                  />
+
+                  {/* Realistic paper creases with enhanced depth */}
+                  {/* Crease 1 - Top highlight line */}
+                  <div
+                    className="absolute pointer-events-none"
+                    style={{
+                      top: crease1.top,
+                      left: crease1.left,
+                      width: crease1.width,
+                      height: '1.5px',
+                      background: 'rgba(255,255,255,0.6)',
+                      transform: `rotate(${crease1.rotation}deg) translateY(-2px)`,
+                      opacity: crease1.opacity * 0.9,
+                      boxShadow: '0 0 2px rgba(255,255,255,0.4)',
+                    }}
+                  />
+                  {/* Crease 1 - Main shadow */}
+                  <div
+                    className="absolute pointer-events-none"
+                    style={{
+                      top: crease1.top,
+                      left: crease1.left,
+                      width: crease1.width,
+                      height: '2px',
+                      background: 'rgba(0,0,0,0.15)',
+                      transform: `rotate(${crease1.rotation}deg)`,
+                      opacity: crease1.opacity,
+                    }}
+                  />
+                  {/* Crease 1 - Bottom shadow fade */}
+                  <div
+                    className="absolute pointer-events-none"
+                    style={{
+                      top: crease1.top,
+                      left: crease1.left,
+                      width: crease1.width,
+                      height: '10px',
+                      background: `linear-gradient(to bottom, rgba(0,0,0,0.12), transparent)`,
+                      transform: `rotate(${crease1.rotation}deg) translateY(1px)`,
+                      opacity: crease1.opacity * 0.8,
+                      filter: 'blur(2px)',
+                    }}
+                  />
+                  
+                  {/* Crease 2 - Top highlight line */}
+                  <div
+                    className="absolute pointer-events-none"
+                    style={{
+                      top: crease2.top,
+                      left: crease2.left,
+                      width: crease2.width,
+                      height: '1.5px',
+                      background: 'rgba(255,255,255,0.5)',
+                      transform: `rotate(${crease2.rotation}deg) translateY(-2px)`,
+                      opacity: crease2.opacity * 0.8,
+                      boxShadow: '0 0 2px rgba(255,255,255,0.3)',
+                    }}
+                  />
+                  {/* Crease 2 - Main shadow */}
+                  <div
+                    className="absolute pointer-events-none"
+                    style={{
+                      top: crease2.top,
+                      left: crease2.left,
+                      width: crease2.width,
+                      height: '2px',
+                      background: 'rgba(0,0,0,0.12)',
+                      transform: `rotate(${crease2.rotation}deg)`,
+                      opacity: crease2.opacity,
+                    }}
+                  />
+                  {/* Crease 2 - Bottom shadow fade */}
+                  <div
+                    className="absolute pointer-events-none"
+                    style={{
+                      top: crease2.top,
+                      left: crease2.left,
+                      width: crease2.width,
+                      height: '8px',
+                      background: `linear-gradient(to bottom, rgba(0,0,0,0.1), transparent)`,
+                      transform: `rotate(${crease2.rotation}deg) translateY(1px)`,
+                      opacity: crease2.opacity * 0.7,
+                      filter: 'blur(2px)',
+                    }}
+                  />
+
+                  {/* Paper rips/tears - more wear on older posts */}
+                  {paperRips.map((rip, idx) => (
+                    <div key={idx}>
+                      {/* Top edge rip */}
+                      {rip.edge === 0 && (
+                        <>
+                          {/* Main tear shadow */}
+                          <div
+                            className="absolute pointer-events-none"
+                            style={{
+                              top: '-1px',
+                              left: `${rip.position}%`,
+                              width: `${rip.size}px`,
+                              height: `${rip.depth + 2}px`,
+                              background: `linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, transparent 100%)`,
+                              clipPath: `polygon(
+                                0% 0%, 12% 45%, 8% 25%, 22% 60%, 18% 35%, 35% 70%, 32% 40%, 
+                                48% 65%, 45% 30%, 62% 75%, 58% 35%, 72% 68%, 68% 28%, 
+                                82% 55%, 88% 40%, 100% 0%
+                              )`,
+                              filter: 'blur(0.5px)',
+                            }}
+                          />
+                          {/* Torn edge highlight */}
+                          <div
+                            className="absolute pointer-events-none"
+                            style={{
+                              top: 0,
+                              left: `${rip.position}%`,
+                              width: `${rip.size}px`,
+                              height: '1px',
+                              background: `linear-gradient(to right, transparent, rgba(255,255,255,0.6) 30%, rgba(255,255,255,0.6) 70%, transparent)`,
+                            }}
+                          />
+                          {/* Dark torn edge */}
+                          <div
+                            className="absolute pointer-events-none"
+                            style={{
+                              top: '1px',
+                              left: `${rip.position}%`,
+                              width: `${rip.size}px`,
+                              height: '1.5px',
+                              background: `linear-gradient(to right, transparent, rgba(0,0,0,0.4) 20%, rgba(0,0,0,0.4) 80%, transparent)`,
+                            }}
+                          />
+                        </>
+                      )}
+                      {/* Right edge rip */}
+                      {rip.edge === 1 && (
+                        <>
+                          {/* Main tear shadow */}
+                          <div
+                            className="absolute pointer-events-none"
+                            style={{
+                              right: '-1px',
+                              top: `${rip.position}%`,
+                              width: `${rip.depth + 2}px`,
+                              height: `${rip.size}px`,
+                              background: `linear-gradient(to left, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, transparent 100%)`,
+                              clipPath: `polygon(
+                                100% 0%, 55% 12%, 75% 8%, 40% 22%, 65% 18%, 30% 35%, 60% 32%, 
+                                35% 48%, 70% 45%, 25% 62%, 65% 58%, 32% 72%, 72% 68%, 
+                                45% 82%, 60% 88%, 100% 100%
+                              )`,
+                              filter: 'blur(0.5px)',
+                            }}
+                          />
+                          {/* Torn edge highlight */}
+                          <div
+                            className="absolute pointer-events-none"
+                            style={{
+                              right: 0,
+                              top: `${rip.position}%`,
+                              width: '1px',
+                              height: `${rip.size}px`,
+                              background: `linear-gradient(to bottom, transparent, rgba(255,255,255,0.6) 30%, rgba(255,255,255,0.6) 70%, transparent)`,
+                            }}
+                          />
+                          {/* Dark torn edge */}
+                          <div
+                            className="absolute pointer-events-none"
+                            style={{
+                              right: '1px',
+                              top: `${rip.position}%`,
+                              width: '1.5px',
+                              height: `${rip.size}px`,
+                              background: `linear-gradient(to bottom, transparent, rgba(0,0,0,0.4) 20%, rgba(0,0,0,0.4) 80%, transparent)`,
+                            }}
+                          />
+                        </>
+                      )}
+                      {/* Bottom edge rip */}
+                      {rip.edge === 2 && (
+                        <>
+                          {/* Main tear shadow */}
+                          <div
+                            className="absolute pointer-events-none"
+                            style={{
+                              bottom: '-1px',
+                              left: `${rip.position}%`,
+                              width: `${rip.size}px`,
+                              height: `${rip.depth + 2}px`,
+                              background: `linear-gradient(to top, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, transparent 100%)`,
+                              clipPath: `polygon(
+                                0% 100%, 12% 55%, 8% 75%, 22% 40%, 18% 65%, 35% 30%, 32% 60%, 
+                                48% 35%, 45% 70%, 62% 25%, 58% 65%, 72% 32%, 68% 72%, 
+                                82% 45%, 88% 60%, 100% 100%
+                              )`,
+                              filter: 'blur(0.5px)',
+                            }}
+                          />
+                          {/* Torn edge highlight */}
+                          <div
+                            className="absolute pointer-events-none"
+                            style={{
+                              bottom: 0,
+                              left: `${rip.position}%`,
+                              width: `${rip.size}px`,
+                              height: '1px',
+                              background: `linear-gradient(to right, transparent, rgba(255,255,255,0.6) 30%, rgba(255,255,255,0.6) 70%, transparent)`,
+                            }}
+                          />
+                          {/* Dark torn edge */}
+                          <div
+                            className="absolute pointer-events-none"
+                            style={{
+                              bottom: '1px',
+                              left: `${rip.position}%`,
+                              width: `${rip.size}px`,
+                              height: '1.5px',
+                              background: `linear-gradient(to right, transparent, rgba(0,0,0,0.4) 20%, rgba(0,0,0,0.4) 80%, transparent)`,
+                            }}
+                          />
+                        </>
+                      )}
+                      {/* Left edge rip */}
+                      {rip.edge === 3 && (
+                        <>
+                          {/* Main tear shadow */}
+                          <div
+                            className="absolute pointer-events-none"
+                            style={{
+                              left: '-1px',
+                              top: `${rip.position}%`,
+                              width: `${rip.depth + 2}px`,
+                              height: `${rip.size}px`,
+                              background: `linear-gradient(to right, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, transparent 100%)`,
+                              clipPath: `polygon(
+                                0% 0%, 45% 12%, 25% 8%, 60% 22%, 35% 18%, 70% 35%, 40% 32%, 
+                                65% 48%, 30% 45%, 75% 62%, 35% 58%, 68% 72%, 28% 68%, 
+                                55% 82%, 40% 88%, 0% 100%
+                              )`,
+                              filter: 'blur(0.5px)',
+                            }}
+                          />
+                          {/* Torn edge highlight */}
+                          <div
+                            className="absolute pointer-events-none"
+                            style={{
+                              left: 0,
+                              top: `${rip.position}%`,
+                              width: '1px',
+                              height: `${rip.size}px`,
+                              background: `linear-gradient(to bottom, transparent, rgba(255,255,255,0.6) 30%, rgba(255,255,255,0.6) 70%, transparent)`,
+                            }}
+                          />
+                          {/* Dark torn edge */}
+                          <div
+                            className="absolute pointer-events-none"
+                            style={{
+                              left: '1px',
+                              top: `${rip.position}%`,
+                              width: '1.5px',
+                              height: `${rip.size}px`,
+                              background: `linear-gradient(to bottom, transparent, rgba(0,0,0,0.4) 20%, rgba(0,0,0,0.4) 80%, transparent)`,
+                            }}
+                          />
+                        </>
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Realistic crack/tear effect overlay */}
+                  <div
+                    className="absolute inset-0 pointer-events-none z-5"
+                    style={{
+                      opacity: crackPattern.mainOpacity,
+                      backgroundImage: `
+                        linear-gradient(${crackPattern.mainAngle}deg,
+                          transparent 0%,
+                          transparent 48.4%,
+                          rgba(0,0,0,.12) 49.3%,
+                          rgba(0,0,0,.12) 50.1%,
+                          transparent 51%,
+                          transparent 100%
+                        ),
+                        linear-gradient(${crackPattern.mainAngle}deg,
+                          transparent 0%,
+                          transparent 48.7%,
+                          rgba(255,255,255,.45) 49.5%,
+                          rgba(255,255,255,.45) 50.2%,
+                          transparent 51%,
+                          transparent 100%
+                        ),
+                        linear-gradient(${crackPattern.branch1Angle}deg,
+                          transparent 0%,
+                          transparent 62%,
+                          rgba(0,0,0,${crackPattern.branchOpacity1}) 62.6%,
+                          rgba(0,0,0,${crackPattern.branchOpacity1}) 63.1%,
+                          transparent 63.6%,
+                          transparent 100%
+                        ),
+                        linear-gradient(${crackPattern.branch2Angle}deg,
+                          transparent 0%,
+                          transparent 68%,
+                          rgba(0,0,0,${crackPattern.branchOpacity2}) 68.4%,
+                          rgba(0,0,0,${crackPattern.branchOpacity2}) 69%,
+                          transparent 69.6%,
+                          transparent 100%
+                        ),
+                        linear-gradient(${crackPattern.branch3Angle}deg,
+                          transparent 0%,
+                          transparent 41%,
+                          rgba(0,0,0,${crackPattern.branchOpacity3}) 41.4%,
+                          rgba(0,0,0,${crackPattern.branchOpacity3}) 41.85%,
+                          transparent 42.3%,
+                          transparent 100%
+                        ),
+                        radial-gradient(circle at ${crackPattern.frac1X}% ${crackPattern.frac1Y}%, rgba(0,0,0,${crackPattern.fracOpacity1}) 0 1px, transparent 2px),
+                        radial-gradient(circle at ${crackPattern.frac2X}% ${crackPattern.frac2Y}%, rgba(0,0,0,${crackPattern.fracOpacity2}) 0 1px, transparent 2px),
+                        radial-gradient(circle at ${crackPattern.frac3X}% ${crackPattern.frac3Y}%, rgba(0,0,0,${crackPattern.fracOpacity3}) 0 1px, transparent 2px),
+                        radial-gradient(circle at ${crackPattern.frac4X}% ${crackPattern.frac4Y}%, rgba(0,0,0,${crackPattern.fracOpacity4}) 0 1px, transparent 2px),
+                        radial-gradient(ellipse at 55% 52%, rgba(0,0,0,.06), transparent 55%)
+                      `,
+                      backgroundSize: `
+                        100% 100%,
+                        100% 100%,
+                        100% 100%,
+                        100% 100%,
+                        100% 100%,
+                        100% 100%,
+                        100% 100%,
+                        100% 100%,
+                        100% 100%,
+                        140% 140%
+                      `,
+                      backgroundPosition: `
+                        0 0,
+                        1px 1px,
+                        0 0,
+                        0 0,
+                        0 0,
+                        0 0,
+                        0 0,
+                        0 0,
+                        0 0,
+                        50% 50%
+                      `,
+                      filter: 'blur(.08px)',
+                      mixBlendMode: 'multiply',
                     }}
                   />
 
                   {/* Content - relative positioning to appear above texture */}
                   <div className="relative z-10">
-                    {/* To: Header - Like Unsent */}
-                    <div className="mb-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-medium uppercase tracking-wide" style={{ color: '#9B9B9B' }}>
-                          To:
-                        </span>
-                        <span className="text-base font-semibold" style={{ color: '#1A1A1A' }}>
-                          {recipientName}
-                        </span>
+                    {/* To: Header - Only show if there's an actual recipient */}
+                    {entry.to && (
+                      <div className="mb-4">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs font-medium uppercase tracking-wide" style={{ color: '#9B9B9B' }}>
+                            To:
+                          </span>
+                          <span className="text-base font-semibold" style={{ color: '#1A1A1A' }}>
+                            {entry.to}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-end">
+                          <span className="text-xs" style={{ color: '#9B9B9B' }}>
+                            {timeAgo}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-end">
-                        <span className="text-xs" style={{ color: '#9B9B9B' }}>
-                          {timeAgo}
-                        </span>
+                    )}
+                    
+                    {/* For notes without "To:" - just show timestamp */}
+                    {!entry.to && (
+                      <div className="mb-4">
+                        <div className="flex items-center justify-end">
+                          <span className="text-xs" style={{ color: '#9B9B9B' }}>
+                            {timeAgo}
+                          </span>
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* Row 2: Message preview */}
                     <p className="text-base leading-relaxed mb-3" style={{ color: '#2A2A2A', fontWeight: '500' }}>
@@ -793,14 +1623,18 @@ export default function FeedClient() {
               {/* Header */}
               <div className="px-6 py-5 border-b flex justify-between items-start" style={{ borderColor: 'rgba(0, 0, 0, 0.1)' }}>
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-medium uppercase tracking-wide" style={{ color: '#9B9B9B' }}>
-                      To:
-                    </span>
-                    <span className="text-xl font-semibold" style={{ color: '#1A1A1A' }}>
-                      {selectedEntry.to || 'Anonymous'}
-                    </span>
-                  </div>
+                  {/* Only show "To:" if there's an actual recipient */}
+                  {selectedEntry.to && (
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-sm font-medium uppercase tracking-wide" style={{ color: '#9B9B9B' }}>
+                        To:
+                      </span>
+                      <span className="text-xl font-semibold" style={{ color: '#1A1A1A' }}>
+                        {selectedEntry.to}
+                      </span>
+                    </div>
+                  )}
+                  {/* Only show "From:" if there's an actual sender */}
                   {selectedEntry.from && (
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-sm font-medium uppercase tracking-wide" style={{ color: '#9B9B9B' }}>
@@ -811,6 +1645,7 @@ export default function FeedClient() {
                       </span>
                     </div>
                   )}
+                  {/* Timestamp */}
                   <div className="text-xs" style={{ color: '#9B9B9B' }}>
                     {mounted ? formatTimeAgo(selectedEntry.publishedAt) : ''} {mounted && '·'} {mounted ? new Date(selectedEntry.publishedAt).toLocaleDateString('en-US', {
                       year: 'numeric',

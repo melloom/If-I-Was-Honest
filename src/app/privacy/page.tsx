@@ -1,21 +1,23 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy - Your Data Protection',
-  description: 'Learn how If I Was Honest protects your privacy and secures your journal entries. We prioritize privacy-first journaling with end-to-end encryption and no data sharing.',
+  title: 'Privacy Policy | TheHonestProject - Your Data Protection',
+  description: 'Learn how TheHonestProject protects your privacy and secures your journal entries. We prioritize privacy-first journaling with strong encryption, anonymity, and no data sharing.',
   keywords: [
     'privacy policy',
     'data protection',
     'journal privacy',
     'secure journaling',
-    'end-to-end encryption',
+    'anonymous privacy',
     'GDPR compliance',
     'data security',
-    'private journal app'
+    'private journal app',
+    'encrypted journaling',
+    'user privacy rights'
   ],
   openGraph: {
-    title: 'Privacy Policy - How We Protect Your Journal Data',
-    description: 'Privacy-first journaling with end-to-end encryption. Learn how we keep your thoughts secure.',
+    title: 'Privacy Policy - TheHonestProject',
+    description: 'Privacy-first anonymous journaling. Learn how we keep your thoughts secure.',
     url: 'https://ifiiwashonest.com/privacy',
     type: 'website'
   }

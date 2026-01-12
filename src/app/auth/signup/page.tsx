@@ -150,10 +150,10 @@ export default function SignUpPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 rounded-lg font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+              className="w-full py-3 rounded-lg font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity flex items-center justify-center min-h-[48px]"
               style={{ backgroundColor: '#1A1A1A', color: '#FFFFFF' }}
             >
-              {isLoading ? 'Creating account...' : 'Sign Up'}
+              <span className="truncate">{isLoading ? 'Creating account...' : 'Sign Up'}</span>
             </button>
           </form>
 

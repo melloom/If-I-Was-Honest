@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
     // Ensure document exists on first creation
     const docSnap = await userRef.get()
-    if (!docSnap.exists()) {
+    if (!docSnap.exists) {
       await userRef.set({
         uid,
         email,

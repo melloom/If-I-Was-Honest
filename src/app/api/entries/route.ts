@@ -39,13 +39,18 @@ export async function GET(request: Request) {
 
     // Get all entries for the user
     const entriesRef = db.collection('entries').doc(userId).collection('entries')
-    let query = entriesRef.where('deletedAt', '==', null).orderBy('createdAt', 'desc')
+    let query = entriesRef.where('deletedAt', '==', null)
 
-    // Apply filter
+    // Apply filter with correct orderBy for inequality constraints
     if (filter === 'private') {
-      query = query.where('publishedAt', '==', null)
+      // Equality filter can order by createdAt directly
+      query = query.where('publishedAt', '==', null).orderBy('createdAt', 'desc')
     } else if (filter === 'shared') {
-      query = query.where('publishedAt', '!=', null)
+      // Inequality on publishedAt requires orderBy on the same field first
+      query = query.where('publishedAt', '!=', null).orderBy('publishedAt', 'desc').orderBy('createdAt', 'desc')
+    } else {
+      // Default: all entries ordered by createdAt
+      query = query.orderBy('createdAt', 'desc')
     }
 
     // Get total count

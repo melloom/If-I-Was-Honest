@@ -1,18 +1,21 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Terms and Conditions - If I Was Honest',
-  description: 'Legal terms and conditions for using If I Was Honest journaling platform.',
+  title: 'Terms & Conditions | TheHonestProject - User Agreement',
+  description: 'Legal terms and conditions for using TheHonestProject anonymous journaling platform. Understand your rights and responsibilities.',
   keywords: [
     'terms of service',
     'user agreement',
     'terms and conditions',
     'legal terms',
-    'usage policy'
+    'usage policy',
+    'platform rules',
+    'user rights',
+    'community guidelines'
   ],
   openGraph: {
-    title: 'Terms and Conditions - If I Was Honest',
-    description: 'Legal terms and conditions for using If I Was Honest.',
+    title: 'Terms & Conditions - TheHonestProject',
+    description: 'Legal terms and conditions for using TheHonestProject.',
     url: 'https://ifiiwashonest.com/terms',
     type: 'website'
   }
