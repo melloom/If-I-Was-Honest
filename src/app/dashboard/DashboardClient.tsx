@@ -308,7 +308,7 @@ export default function DashboardClient() {
       while (!token && user && retries < 3) {
         console.log(`[Dashboard] Token not ready, waiting... (attempt ${retries + 1}/3)`)
         await new Promise(resolve => setTimeout(resolve, 500))
-        
+
         // Try to force refresh the token
         if (user && !token) {
           try {
@@ -323,7 +323,7 @@ export default function DashboardClient() {
         }
         retries++
       }
-      
+
       if (!token) {
         console.error('[Dashboard] No auth token available after retries')
         setErrorMessage('Authentication failed. Please refresh the page and try again.')
@@ -334,8 +334,8 @@ export default function DashboardClient() {
 
       const response = await fetch(`/api/entries/${entryId}`, {
         method: 'PATCH',
-        headers: { 
-          'Content-Type': 'application/json', 
+        headers: {
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ status: newStatus }),
@@ -344,7 +344,7 @@ export default function DashboardClient() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
         const errorMessage = errorData.message || errorData.error || 'Failed to update status'
-        
+
         // Show user-friendly error message
         if (response.status === 429) {
           setErrorMessage(errorMessage)
@@ -353,7 +353,7 @@ export default function DashboardClient() {
         } else {
           setErrorMessage(errorMessage)
         }
-        
+
         // Use console.warn for expected rate limits, console.error for real errors
         if (response.status === 429) {
           console.warn('Status change rate limited:', errorMessage)
@@ -633,7 +633,7 @@ export default function DashboardClient() {
                 </p>
               )}
             </>
-            
+
           ) : (
             <>
               <h1 className="text-5xl md:text-6xl font-bold mb-4" style={{ color: '#1a1a1a', letterSpacing: '-0.02em' }}>
@@ -1078,8 +1078,8 @@ export default function DashboardClient() {
                                 </svg>
                               </button>
                               {statusDropdownOpen === entry.id && (
-                                <div 
-                                  className="absolute left-0 top-full mt-1 bg-white border rounded-lg shadow-lg z-20 min-w-[180px]" 
+                                <div
+                                  className="absolute left-0 top-full mt-1 bg-white border rounded-lg shadow-lg z-20 min-w-[180px]"
                                   style={{ borderColor: '#e0e0e0' }}
                                   onClick={(e) => e.stopPropagation()}
                                 >

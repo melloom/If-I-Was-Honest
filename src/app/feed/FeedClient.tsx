@@ -159,7 +159,7 @@ export default function FeedClient() {
         setStatusDropdownOpen(null)
       }
     }
-    
+
     document.addEventListener('click', handleClickOutside)
     return () => document.removeEventListener('click', handleClickOutside)
   }, [statusDropdownOpen])
@@ -296,7 +296,7 @@ export default function FeedClient() {
       while (!token && user && retries < 3) {
         console.log(`[Feed] Token not ready, waiting... (attempt ${retries + 1}/3)`)
         await new Promise(resolve => setTimeout(resolve, 500))
-        
+
         // Try to force refresh the token
         if (user && !token) {
           try {
@@ -311,7 +311,7 @@ export default function FeedClient() {
         }
         retries++
       }
-      
+
       if (!token) {
         console.error('[Feed] No auth token available after retries')
         setErrorMessage('Authentication failed. Please refresh the page and try again.')
@@ -322,8 +322,8 @@ export default function FeedClient() {
 
       const response = await fetch(`/api/entries/${entryId}`, {
         method: 'PATCH',
-        headers: { 
-          'Content-Type': 'application/json', 
+        headers: {
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ status: newStatus }),
@@ -332,7 +332,7 @@ export default function FeedClient() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
         const errorMessage = errorData.message || errorData.error || 'Failed to update status'
-        
+
         if (response.status === 429) {
           setErrorMessage(`Rate limit: ${errorMessage}`)
         } else if (response.status === 401) {
@@ -340,7 +340,7 @@ export default function FeedClient() {
         } else {
           setErrorMessage(errorMessage)
         }
-        
+
         console.error('Status update failed:', errorMessage)
         return
       }
@@ -351,10 +351,10 @@ export default function FeedClient() {
           entry.id === entryId ? { ...entry, status: newStatus } : entry
         )
       )
-      
+
       // Close dropdown
       setStatusDropdownOpen(null)
-      
+
       console.log('[Feed] Status updated successfully')
     } catch (error) {
       console.error('Error updating status:', error)
@@ -699,15 +699,15 @@ export default function FeedClient() {
                 }
                 // Determine tape location: 0=top, 1=bottom, 2=left side, 3=right side
                 const location = Math.abs(hash) % 4
-                
+
                 // Random position along edge (10-30% from corner)
                 const position = 10 + (Math.abs(hash) % 21)
                 const rotation = ((Math.abs(hash) % 12) - 6) // -6 to +6 degrees
                 const width = 18 + (Math.abs(hash) % 10) // 18-28px base width
-                
-                return { 
-                  position: `${position}%`, 
-                  rotation, 
+
+                return {
+                  position: `${position}%`,
+                  rotation,
                   width,
                   location // 0=top, 1=bottom, 2=left, 3=right
                 }
@@ -720,23 +720,23 @@ export default function FeedClient() {
                   hash = (id.charCodeAt(i) * (index * 17) + ((hash << 6) - hash)) | 0
                 }
                 const absHash = Math.abs(hash)
-                
+
                 // Creases positioned more naturally across the card
                 // First crease: upper third (25-40%)
                 // Second crease: middle (45-65%)
                 const top = index === 1 ? 25 + (absHash % 16) : // 25-40%
                            50 + (absHash % 16) // 50-65%
-                
+
                 // More varied horizontal positioning
                 const left = 2 + (absHash % 8) // 2-10% from left
                 const width = 80 + (absHash % 16) // 80-95% width
-                
+
                 // Slightly more varied rotation for natural look
                 const rotation = ((absHash % 8) - 4) / 2 // -2 to +2 degrees
-                
+
                 // Better opacity variation
                 const opacity = 0.6 + (absHash % 20) / 100 // 0.6-0.8
-                
+
                 return { top: `${top}%`, left: `${left}%`, width: `${width}%`, rotation, opacity }
               }
 
@@ -745,17 +745,17 @@ export default function FeedClient() {
                 const now = new Date().getTime()
                 const postDate = new Date(publishedAt).getTime()
                 const ageInDays = (now - postDate) / (1000 * 60 * 60 * 24)
-                
+
                 let hash = 0
                 for (let i = 0; i < id.length; i++) {
                   hash = (id.charCodeAt(i) * 31 + ((hash << 5) - hash)) | 0
                 }
                 const absHash = Math.abs(hash)
-                
+
                 // More rips for older posts
                 const ripCount = ageInDays < 7 ? 2 : ageInDays < 30 ? 3 : 4
                 const ripIntensity = Math.min(ageInDays / 365, 1) // 0-1 based on age up to 1 year
-                
+
                 // Generate random edge positions for rips - MUCH BIGGER
                 const rips = []
                 for (let i = 0; i < ripCount; i++) {
@@ -766,7 +766,7 @@ export default function FeedClient() {
                   const depth = 6 + Math.floor(ripIntensity * 10) + (edgeHash % 8) // 6-24px
                   rips.push({ edge, position, size, depth })
                 }
-                
+
                 return rips
               }
 
@@ -777,23 +777,23 @@ export default function FeedClient() {
                   hash = (id.charCodeAt(i) * 41 + ((hash << 7) - hash)) | 0
                 }
                 const absHash = Math.abs(hash)
-                
+
                 // Main crack angle (varied between 90-150 degrees)
                 const mainAngle = 90 + (absHash % 61)
-                
+
                 // Branch crack angles (varied)
                 const branch1Angle = 140 + (absHash % 50)
                 const branch2Angle = 20 + ((absHash >> 2) % 70)
                 const branch3Angle = 80 + ((absHash >> 4) % 35)
-                
+
                 // Main crack opacity (much lighter: 0.15-0.35)
                 const mainOpacity = 0.15 + ((absHash % 21) / 100)
-                
+
                 // Branch crack opacities (very light: 0.08-0.22)
                 const branchOpacity1 = 0.08 + ((absHash % 15) / 100)
                 const branchOpacity2 = 0.07 + (((absHash >> 2) % 16) / 100)
                 const branchOpacity3 = 0.06 + (((absHash >> 4) % 15) / 100)
-                
+
                 // Micro fracture positions (varied)
                 const frac1X = 45 + (absHash % 20)
                 const frac1Y = 35 + (absHash % 30)
@@ -803,13 +803,13 @@ export default function FeedClient() {
                 const frac3Y = 50 + ((absHash >> 2) % 25)
                 const frac4X = 35 + ((absHash >> 3) % 30)
                 const frac4Y = 45 + ((absHash >> 3) % 30)
-                
+
                 // Micro fracture opacities (much lighter: 0.04-0.12)
                 const fracOpacity1 = 0.04 + ((absHash % 9) / 100)
                 const fracOpacity2 = 0.03 + (((absHash >> 1) % 8) / 100)
                 const fracOpacity3 = 0.04 + (((absHash >> 2) % 9) / 100)
                 const fracOpacity4 = 0.03 + (((absHash >> 3) % 8) / 100)
-                
+
                 return {
                   mainAngle,
                   branch1Angle,
@@ -922,7 +922,7 @@ export default function FeedClient() {
                       }}
                     />
                   )}
-                  
+
                   {/* Right tape */}
                   {rightTape.location === 0 && ( // Top edge
                     <div
@@ -992,14 +992,14 @@ export default function FeedClient() {
                       }}
                     />
                   )}
-                  
+
                   {/* Status badge */}
-                  <div 
+                  <div
                     className="absolute top-4 right-4 z-20"
                   >
                     {entry.userId === user?.uid ? (
                       // User owns this entry - make status clickable with dropdown
-                      <div 
+                      <div
                         className="relative"
                       >
                         <button
@@ -1014,10 +1014,10 @@ export default function FeedClient() {
                           <span>{statusOption.emoji}</span>
                           {statusOption.label}
                         </button>
-                        
+
                         {/* Status dropdown menu */}
                         {statusDropdownOpen === entry.id && (
-                          <div 
+                          <div
                             className="absolute right-0 top-full w-48 rounded-lg shadow-xl border overflow-hidden z-50"
                             style={{ backgroundColor: '#FFFFFF', borderColor: '#E0E0E0' }}
                             onClick={(e) => e.stopPropagation()}
@@ -1030,7 +1030,7 @@ export default function FeedClient() {
                                   handleStatusChange(entry.id, status.value)
                                 }}
                                 className="w-full px-4 py-2.5 text-left text-sm font-medium flex items-center gap-2 transition-all"
-                                style={{ 
+                                style={{
                                   backgroundColor: entry.status === status.value ? status.color : '#FFFFFF',
                                   color: entry.status === status.value ? status.textColor : '#4A4A4A',
                                   opacity: entry.status === status.value ? 1 : 0.9
@@ -1068,7 +1068,7 @@ export default function FeedClient() {
                       </span>
                     )}
                   </div>
-                  
+
                   {/* Paper lighting - subtle gradient for depth and realism */}
                   <div
                     className="absolute inset-0 pointer-events-none rounded-sm"
@@ -1076,7 +1076,7 @@ export default function FeedClient() {
                       background: 'radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.03) 100%)',
                     }}
                   />
-                  
+
                   {/* MUCH MORE VISIBLE paper texture */}
                   <div
                     className="absolute inset-0 pointer-events-none rounded-sm"
@@ -1144,7 +1144,7 @@ export default function FeedClient() {
                       filter: 'blur(2px)',
                     }}
                   />
-                  
+
                   {/* Crease 2 - Top highlight line */}
                   <div
                     className="absolute pointer-events-none"
@@ -1203,8 +1203,8 @@ export default function FeedClient() {
                               height: `${rip.depth + 2}px`,
                               background: `linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, transparent 100%)`,
                               clipPath: `polygon(
-                                0% 0%, 12% 45%, 8% 25%, 22% 60%, 18% 35%, 35% 70%, 32% 40%, 
-                                48% 65%, 45% 30%, 62% 75%, 58% 35%, 72% 68%, 68% 28%, 
+                                0% 0%, 12% 45%, 8% 25%, 22% 60%, 18% 35%, 35% 70%, 32% 40%,
+                                48% 65%, 45% 30%, 62% 75%, 58% 35%, 72% 68%, 68% 28%,
                                 82% 55%, 88% 40%, 100% 0%
                               )`,
                               filter: 'blur(0.5px)',
@@ -1247,8 +1247,8 @@ export default function FeedClient() {
                               height: `${rip.size}px`,
                               background: `linear-gradient(to left, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, transparent 100%)`,
                               clipPath: `polygon(
-                                100% 0%, 55% 12%, 75% 8%, 40% 22%, 65% 18%, 30% 35%, 60% 32%, 
-                                35% 48%, 70% 45%, 25% 62%, 65% 58%, 32% 72%, 72% 68%, 
+                                100% 0%, 55% 12%, 75% 8%, 40% 22%, 65% 18%, 30% 35%, 60% 32%,
+                                35% 48%, 70% 45%, 25% 62%, 65% 58%, 32% 72%, 72% 68%,
                                 45% 82%, 60% 88%, 100% 100%
                               )`,
                               filter: 'blur(0.5px)',
@@ -1291,8 +1291,8 @@ export default function FeedClient() {
                               height: `${rip.depth + 2}px`,
                               background: `linear-gradient(to top, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, transparent 100%)`,
                               clipPath: `polygon(
-                                0% 100%, 12% 55%, 8% 75%, 22% 40%, 18% 65%, 35% 30%, 32% 60%, 
-                                48% 35%, 45% 70%, 62% 25%, 58% 65%, 72% 32%, 68% 72%, 
+                                0% 100%, 12% 55%, 8% 75%, 22% 40%, 18% 65%, 35% 30%, 32% 60%,
+                                48% 35%, 45% 70%, 62% 25%, 58% 65%, 72% 32%, 68% 72%,
                                 82% 45%, 88% 60%, 100% 100%
                               )`,
                               filter: 'blur(0.5px)',
@@ -1335,8 +1335,8 @@ export default function FeedClient() {
                               height: `${rip.size}px`,
                               background: `linear-gradient(to right, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, transparent 100%)`,
                               clipPath: `polygon(
-                                0% 0%, 45% 12%, 25% 8%, 60% 22%, 35% 18%, 70% 35%, 40% 32%, 
-                                65% 48%, 30% 45%, 75% 62%, 35% 58%, 68% 72%, 28% 68%, 
+                                0% 0%, 45% 12%, 25% 8%, 60% 22%, 35% 18%, 70% 35%, 40% 32%,
+                                65% 48%, 30% 45%, 75% 62%, 35% 58%, 68% 72%, 28% 68%,
                                 55% 82%, 40% 88%, 0% 100%
                               )`,
                               filter: 'blur(0.5px)',
@@ -1470,7 +1470,7 @@ export default function FeedClient() {
                         </div>
                       </div>
                     )}
-                    
+
                     {/* For notes without "To:" - just show timestamp */}
                     {!entry.to && (
                       <div className="mb-4">

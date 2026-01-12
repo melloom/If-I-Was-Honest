@@ -29,7 +29,7 @@ interface UseRealtimeEntriesOptions {
 }
 
 export function useRealtimeEntries(
-  userId: string | undefined, 
+  userId: string | undefined,
   setEntries: (entries: Entry[]) => void,
   options: UseRealtimeEntriesOptions = {}
 ) {
@@ -41,34 +41,34 @@ export function useRealtimeEntries(
     const app = getFirebaseApp()
     const db = getFirestore(app)
     const entriesRef = collection(db, 'entries', userId, 'entries')
-    
+
     // Build query based on filter
     let q = query(entriesRef, orderBy('createdAt', 'desc'))
-    
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const entries = snapshot.docs
         .map(doc => {
           const data = doc.data()
-          
+
           // Skip soft-deleted entries
           if (data.deletedAt) return null
-          
+
           // Apply filter
           const isPublished = !!data.publishedAt
           if (filter === 'private' && isPublished) return null
           if (filter === 'shared' && !isPublished) return null
-          
+
           // Convert Firestore timestamps to ISO strings
-          const createdAt = data.createdAt instanceof Timestamp 
-            ? data.createdAt.toDate().toISOString() 
+          const createdAt = data.createdAt instanceof Timestamp
+            ? data.createdAt.toDate().toISOString()
             : data.createdAt || new Date().toISOString()
-          const updatedAt = data.updatedAt instanceof Timestamp 
-            ? data.updatedAt.toDate().toISOString() 
+          const updatedAt = data.updatedAt instanceof Timestamp
+            ? data.updatedAt.toDate().toISOString()
             : data.updatedAt || createdAt
           const publishedAt = data.publishedAt instanceof Timestamp
             ? data.publishedAt.toDate().toISOString()
             : data.publishedAt || null
-          
+
           return {
             id: doc.id,
             content: data.content || '',
@@ -85,12 +85,12 @@ export function useRealtimeEntries(
           } as Entry
         })
         .filter((entry): entry is Entry => entry !== null)
-      
+
       setEntries(entries)
     }, (error) => {
       console.error('[useRealtimeEntries] Error:', error)
     })
-    
+
     return () => unsubscribe()
   }, [userId, setEntries, filter])
 }

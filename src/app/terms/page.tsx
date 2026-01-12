@@ -39,8 +39,8 @@ export default function TermsPage() {
               1. Agreement to Terms
             </h2>
             <p>
-              By accessing or using If I Was Honest ("the Service", "Platform", "we", "us", or "our"), 
-              you agree to be bound by these Terms and Conditions ("Terms"). If you disagree with any 
+              By accessing or using If I Was Honest ("the Service", "Platform", "we", "us", or "our"),
+              you agree to be bound by these Terms and Conditions ("Terms"). If you disagree with any
               part of these terms, you do not have permission to access the Service.
             </p>
           </section>
@@ -50,8 +50,8 @@ export default function TermsPage() {
               2. Eligibility
             </h2>
             <p>
-              You must be at least 13 years of age to use this Service. If you are under 18, you must 
-              have parental or guardian consent. By using the Service, you represent and warrant that 
+              You must be at least 13 years of age to use this Service. If you are under 18, you must
+              have parental or guardian consent. By using the Service, you represent and warrant that
               you meet these age requirements and have the legal capacity to enter into these Terms.
             </p>
           </section>
@@ -84,7 +84,7 @@ export default function TermsPage() {
               <li>Accept responsibility for all activities that occur under your account</li>
             </ul>
             <p className="mt-4">
-              We reserve the right to suspend or terminate accounts that violate these Terms or 
+              We reserve the right to suspend or terminate accounts that violate these Terms or
               engage in fraudulent, abusive, or illegal activity.
             </p>
           </section>
@@ -94,9 +94,9 @@ export default function TermsPage() {
               5. User Content and Ownership
             </h2>
             <p>
-              <strong>5.1 Your Content:</strong> You retain all ownership rights to content you create and post 
-              on the Service ("User Content"). By posting content, you grant us a worldwide, non-exclusive, 
-              royalty-free, sublicensable license to use, reproduce, adapt, publish, translate, and distribute 
+              <strong>5.1 Your Content:</strong> You retain all ownership rights to content you create and post
+              on the Service ("User Content"). By posting content, you grant us a worldwide, non-exclusive,
+              royalty-free, sublicensable license to use, reproduce, adapt, publish, translate, and distribute
               your User Content in connection with operating and improving the Service.
             </p>
             <p className="mt-4">
@@ -110,7 +110,7 @@ export default function TermsPage() {
               <li>Deleted posts are removed from public view but may be retained for legal compliance</li>
             </ul>
             <p className="mt-4">
-              <strong>5.3 Private Journal Entries:</strong> Private journal entries remain private and can 
+              <strong>5.3 Private Journal Entries:</strong> Private journal entries remain private and can
               be deleted at any time without restriction.
             </p>
           </section>
@@ -159,7 +159,7 @@ export default function TermsPage() {
               <li>Implement automated systems to detect prohibited content</li>
             </ul>
             <p className="mt-4">
-              We are not obligated to monitor User Content but reserve the right to do so. 
+              We are not obligated to monitor User Content but reserve the right to do so.
               We do not pre-screen content and are not responsible for content posted by users.
             </p>
           </section>
@@ -169,7 +169,7 @@ export default function TermsPage() {
               8. Content Warning and User Discretion
             </h2>
             <p>
-              This Service allows uncensored, honest sharing of thoughts and feelings. You may encounter 
+              This Service allows uncensored, honest sharing of thoughts and feelings. You may encounter
               content discussing:
             </p>
             <ul className="list-disc pl-6 space-y-2 mt-2">
@@ -180,8 +180,8 @@ export default function TermsPage() {
               <li>Other sensitive or potentially triggering subjects</li>
             </ul>
             <p className="mt-4">
-              <strong>You use this Service at your own risk.</strong> We are not responsible for emotional 
-              distress or harm resulting from content you encounter. If you are in crisis, please seek 
+              <strong>You use this Service at your own risk.</strong> We are not responsible for emotional
+              distress or harm resulting from content you encounter. If you are in crisis, please seek
               professional help immediately.
             </p>
           </section>
@@ -191,8 +191,8 @@ export default function TermsPage() {
               9. Not Medical or Therapeutic Services
             </h2>
             <p>
-              <strong>IMPORTANT:</strong> This Service is NOT a substitute for professional mental health 
-              care, therapy, counseling, or medical advice. The Service does not provide medical or 
+              <strong>IMPORTANT:</strong> This Service is NOT a substitute for professional mental health
+              care, therapy, counseling, or medical advice. The Service does not provide medical or
               therapeutic services. User Content is not reviewed by licensed professionals.
             </p>
             <p className="mt-4">
@@ -213,9 +213,9 @@ export default function TermsPage() {
               10. Privacy and Data
             </h2>
             <p>
-              Your privacy is important to us. Our collection, use, and protection of your personal 
-              information is governed by our Privacy Policy, which is incorporated into these Terms by 
-              reference. By using the Service, you consent to our data practices as described in the 
+              Your privacy is important to us. Our collection, use, and protection of your personal
+              information is governed by our Privacy Policy, which is incorporated into these Terms by
+              reference. By using the Service, you consent to our data practices as described in the
               Privacy Policy.
             </p>
           </section>
@@ -225,7 +225,7 @@ export default function TermsPage() {
               11. Account Deletion and Data Retention
             </h2>
             <p>
-              <strong>11.1 Grace Period:</strong> When you request account deletion, you have a 24-hour 
+              <strong>11.1 Grace Period:</strong> When you request account deletion, you have a 24-hour
               grace period to cancel the deletion. After 24 hours, deletion becomes permanent.
             </p>
             <p className="mt-4">
@@ -251,13 +251,13 @@ export default function TermsPage() {
               12. Intellectual Property
             </h2>
             <p>
-              The Service, including its original content, features, and functionality, is owned by 
-              If I Was Honest and is protected by international copyright, trademark, patent, trade 
+              The Service, including its original content, features, and functionality, is owned by
+              If I Was Honest and is protected by international copyright, trademark, patent, trade
               secret, and other intellectual property laws.
             </p>
             <p className="mt-4">
-              You may not copy, modify, distribute, sell, or lease any part of our Service or software, 
-              nor may you reverse engineer or attempt to extract source code, unless expressly permitted 
+              You may not copy, modify, distribute, sell, or lease any part of our Service or software,
+              nor may you reverse engineer or attempt to extract source code, unless expressly permitted
               by law or with our written permission.
             </p>
           </section>
@@ -267,8 +267,8 @@ export default function TermsPage() {
               13. Third-Party Links and Services
             </h2>
             <p>
-              The Service may contain links to third-party websites or services that are not owned or 
-              controlled by us. We have no control over, and assume no responsibility for, the content, 
+              The Service may contain links to third-party websites or services that are not owned or
+              controlled by us. We have no control over, and assume no responsibility for, the content,
               privacy policies, or practices of any third-party sites or services.
             </p>
           </section>
@@ -278,7 +278,7 @@ export default function TermsPage() {
               14. Disclaimers and Warranties
             </h2>
             <p className="font-semibold">
-              THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, 
+              THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND,
               WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO:
             </p>
             <ul className="list-disc pl-6 space-y-2 mt-2">
@@ -289,7 +289,7 @@ export default function TermsPage() {
               <li>Uninterrupted, secure, or error-free operation</li>
             </ul>
             <p className="mt-4">
-              We do not warrant that the Service will meet your requirements, that defects will be 
+              We do not warrant that the Service will meet your requirements, that defects will be
               corrected, or that the Service is free of viruses or other harmful components.
             </p>
           </section>
@@ -299,7 +299,7 @@ export default function TermsPage() {
               15. Limitation of Liability
             </h2>
             <p className="font-semibold">
-              TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL IF I WAS HONEST, 
+              TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL IF I WAS HONEST,
               ITS OFFICERS, DIRECTORS, EMPLOYEES, AGENTS, OR AFFILIATES BE LIABLE FOR ANY:
             </p>
             <ul className="list-disc pl-6 space-y-2 mt-2">
@@ -310,11 +310,11 @@ export default function TermsPage() {
               <li>Emotional distress or psychological harm</li>
             </ul>
             <p className="mt-4">
-              WHETHER BASED ON WARRANTY, CONTRACT, TORT (INCLUDING NEGLIGENCE), OR ANY OTHER LEGAL 
+              WHETHER BASED ON WARRANTY, CONTRACT, TORT (INCLUDING NEGLIGENCE), OR ANY OTHER LEGAL
               THEORY, EVEN IF WE HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
             </p>
             <p className="mt-4">
-              IN JURISDICTIONS THAT DO NOT ALLOW THE EXCLUSION OR LIMITATION OF LIABILITY, OUR 
+              IN JURISDICTIONS THAT DO NOT ALLOW THE EXCLUSION OR LIMITATION OF LIABILITY, OUR
               LIABILITY SHALL BE LIMITED TO THE MAXIMUM EXTENT PERMITTED BY LAW.
             </p>
           </section>
@@ -324,9 +324,9 @@ export default function TermsPage() {
               16. Indemnification
             </h2>
             <p>
-              You agree to indemnify, defend, and hold harmless If I Was Honest and its officers, 
-              directors, employees, contractors, agents, licensors, and suppliers from and against 
-              any claims, liabilities, damages, losses, costs, expenses, or fees (including reasonable 
+              You agree to indemnify, defend, and hold harmless If I Was Honest and its officers,
+              directors, employees, contractors, agents, licensors, and suppliers from and against
+              any claims, liabilities, damages, losses, costs, expenses, or fees (including reasonable
               attorneys' fees) arising from:
             </p>
             <ul className="list-disc pl-6 space-y-2 mt-2">
@@ -342,16 +342,16 @@ export default function TermsPage() {
               17. Dispute Resolution and Arbitration
             </h2>
             <p>
-              <strong>17.1 Informal Resolution:</strong> Before filing a claim, you agree to contact us 
+              <strong>17.1 Informal Resolution:</strong> Before filing a claim, you agree to contact us
               at contact@mellowsites.com to attempt to resolve the dispute informally.
             </p>
             <p className="mt-4">
-              <strong>17.2 Binding Arbitration:</strong> If informal resolution fails, any dispute arising 
-              from these Terms or the Service shall be resolved through binding arbitration, except that 
+              <strong>17.2 Binding Arbitration:</strong> If informal resolution fails, any dispute arising
+              from these Terms or the Service shall be resolved through binding arbitration, except that
               either party may bring suit in court for injunctive or equitable relief.
             </p>
             <p className="mt-4">
-              <strong>17.3 Class Action Waiver:</strong> You agree to resolve disputes individually. 
+              <strong>17.3 Class Action Waiver:</strong> You agree to resolve disputes individually.
               You waive any right to participate in class actions or class arbitrations.
             </p>
           </section>
@@ -361,9 +361,9 @@ export default function TermsPage() {
               18. Governing Law and Jurisdiction
             </h2>
             <p>
-              These Terms shall be governed by and construed in accordance with the laws of the State 
-              of Delaware, United States, without regard to its conflict of law provisions. Any legal 
-              action or proceeding arising under these Terms shall be brought exclusively in the courts 
+              These Terms shall be governed by and construed in accordance with the laws of the State
+              of Delaware, United States, without regard to its conflict of law provisions. Any legal
+              action or proceeding arising under these Terms shall be brought exclusively in the courts
               located in Delaware, and you irrevocably consent to personal jurisdiction and venue there.
             </p>
           </section>
@@ -373,11 +373,11 @@ export default function TermsPage() {
               19. Termination
             </h2>
             <p>
-              <strong>19.1 By You:</strong> You may terminate your account at any time through account 
+              <strong>19.1 By You:</strong> You may terminate your account at any time through account
               settings or by contacting us at contact@mellowsites.com.
             </p>
             <p className="mt-4">
-              <strong>19.2 By Us:</strong> We may terminate or suspend your access immediately, without 
+              <strong>19.2 By Us:</strong> We may terminate or suspend your access immediately, without
               prior notice or liability, for any reason, including:
             </p>
             <ul className="list-disc pl-6 space-y-2 mt-2">
@@ -386,8 +386,8 @@ export default function TermsPage() {
               <li>At our sole discretion</li>
             </ul>
             <p className="mt-4">
-              Upon termination, your right to use the Service will immediately cease. Provisions that by 
-              their nature should survive termination shall survive, including ownership, warranty 
+              Upon termination, your right to use the Service will immediately cease. Provisions that by
+              their nature should survive termination shall survive, including ownership, warranty
               disclaimers, indemnity, and limitations of liability.
             </p>
           </section>
@@ -397,8 +397,8 @@ export default function TermsPage() {
               20. Changes to Terms
             </h2>
             <p>
-              We reserve the right to modify or replace these Terms at any time at our sole discretion. 
-              If a revision is material, we will provide at least 30 days' notice before new terms take 
+              We reserve the right to modify or replace these Terms at any time at our sole discretion.
+              If a revision is material, we will provide at least 30 days' notice before new terms take
               effect via:
             </p>
             <ul className="list-disc pl-6 space-y-2 mt-2">
@@ -406,7 +406,7 @@ export default function TermsPage() {
               <li>Prominent notice on the Service</li>
             </ul>
             <p className="mt-4">
-              Your continued use of the Service after changes become effective constitutes acceptance 
+              Your continued use of the Service after changes become effective constitutes acceptance
               of the revised Terms. If you do not agree to the new terms, you must stop using the Service.
             </p>
           </section>
@@ -416,8 +416,8 @@ export default function TermsPage() {
               21. Severability
             </h2>
             <p>
-              If any provision of these Terms is held to be invalid, illegal, or unenforceable, the 
-              validity, legality, and enforceability of the remaining provisions shall not be affected 
+              If any provision of these Terms is held to be invalid, illegal, or unenforceable, the
+              validity, legality, and enforceability of the remaining provisions shall not be affected
               or impaired.
             </p>
           </section>
@@ -427,8 +427,8 @@ export default function TermsPage() {
               22. Entire Agreement
             </h2>
             <p>
-              These Terms, together with our Privacy Policy, constitute the entire agreement between 
-              you and If I Was Honest regarding the Service and supersede all prior agreements and 
+              These Terms, together with our Privacy Policy, constitute the entire agreement between
+              you and If I Was Honest regarding the Service and supersede all prior agreements and
               understandings.
             </p>
           </section>
@@ -451,8 +451,8 @@ export default function TermsPage() {
               Acknowledgment
             </p>
             <p className="text-sm mt-2" style={{ color: '#6a6a6a' }}>
-              BY USING IF I WAS HONEST, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE 
-              TO BE BOUND BY THESE TERMS AND CONDITIONS. IF YOU DO NOT AGREE TO THESE TERMS, DO NOT 
+              BY USING IF I WAS HONEST, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE
+              TO BE BOUND BY THESE TERMS AND CONDITIONS. IF YOU DO NOT AGREE TO THESE TERMS, DO NOT
               USE THE SERVICE.
             </p>
           </div>

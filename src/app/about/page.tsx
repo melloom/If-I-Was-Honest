@@ -46,14 +46,14 @@ export default function AboutPage() {
                 these unsaid words live within us, quietly shaping our lives and relationships.
               </p>
               <p>
-                <strong>TheHonestProject</strong> (also known as <strong>If I Was Honest</strong>) is a space designed for these unspoken truths. A place where you can 
-                write what you've always wanted to say but couldn't. Where honesty doesn't require courage, just words 
-                on a screen. Where your deepest thoughts can exist safely, privately, until you decide they're ready 
+                <strong>TheHonestProject</strong> (also known as <strong>If I Was Honest</strong>) is a space designed for these unspoken truths. A place where you can
+                write what you've always wanted to say but couldn't. Where honesty doesn't require courage, just words
+                on a screen. Where your deepest thoughts can exist safely, privately, until you decide they're ready
                 to be shared.
               </p>
               <p>
-                This is more than journaling—it's emotional archaeology. Digging through layers of what we think we 
-                should feel to find what we actually do. And when you're ready, your anonymous truth can help others 
+                This is more than journaling—it's emotional archaeology. Digging through layers of what we think we
+                should feel to find what we actually do. And when you're ready, your anonymous truth can help others
                 realize they're not alone in theirs.
               </p>
             </div>
@@ -155,27 +155,27 @@ export default function AboutPage() {
             <div className="space-y-4" style={{ color: '#4a4a4a', lineHeight: '1.8', fontSize: '1.0625rem' }}>
               <p>
                 This project was inspired by{' '}
-                <a 
-                  href="https://theunsentproject.com" 
-                  target="_blank" 
+                <a
+                  href="https://theunsentproject.com"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="font-semibold hover:underline transition-opacity hover:opacity-70"
                   style={{ color: '#2c2c2c' }}
                 >
                   The Unsent Project
                 </a>
-                {' '}by Rora Blue—a powerful art project where people submit unsent text messages to their first love, 
+                {' '}by Rora Blue—a powerful art project where people submit unsent text messages to their first love,
                 each associated with a color. Their work beautifully captures the universal experience of words left unsaid.
               </p>
               <p>
-                While The Unsent Project focuses on messages to first loves, <strong>TheHonestProject</strong> expands this concept 
-                to include all the honest thoughts we carry—to ourselves, to others, to the world. Messages to parents we 
-                never reconciled with. Apologies to friends we've lost. Truths we need to tell ourselves. Words we wish we 
+                While The Unsent Project focuses on messages to first loves, <strong>TheHonestProject</strong> expands this concept
+                to include all the honest thoughts we carry—to ourselves, to others, to the world. Messages to parents we
+                never reconciled with. Apologies to friends we've lost. Truths we need to tell ourselves. Words we wish we
                 could say to who we used to be.
               </p>
               <p>
-                We're deeply grateful to Rora Blue for pioneering this space of vulnerability and showing the world that 
-                our unsent words matter. Their vision inspired us to create a broader canvas where every unspoken truth 
+                We're deeply grateful to Rora Blue for pioneering this space of vulnerability and showing the world that
+                our unsent words matter. Their vision inspired us to create a broader canvas where every unspoken truth
                 can find a home.
               </p>
             </div>
@@ -241,7 +241,7 @@ export default function AboutPage() {
                   This platform is <strong>not a substitute</strong> for professional mental health care.
                   If you're experiencing a crisis, having thoughts of suicide, or need immediate support, please reach out to trained professionals immediately:
                 </p>
-                
+
                 <div className="grid md:grid-cols-2 gap-6 mb-6">
                   {/* US Crisis Lines */}
                   <div className="bg-white rounded-lg p-5 border" style={{ borderColor: '#fca5a5' }}>
