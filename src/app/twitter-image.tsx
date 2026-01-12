@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og'
 
 export const runtime = 'edge'
-export const alt = 'If I Was Honest - Private Journaling & Mental Wellness'
+export const alt = 'If I Was Honest - Anonymous Thoughts You Never Sent'
 export const size = {
   width: 1200,
   height: 630,
@@ -19,9 +19,8 @@ export default async function Image() {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: '#fafafa',
-          backgroundImage: 'radial-gradient(circle at 25px 25px, #e0e0e0 2%, transparent 0%), radial-gradient(circle at 75px 75px, #e0e0e0 2%, transparent 0%)',
-          backgroundSize: '100px 100px',
+          backgroundColor: '#1a1a1a',
+          backgroundImage: 'radial-gradient(circle at 50% 50%, #2a2a2a 0%, #1a1a1a 100%)',
         }}
       >
         <div
@@ -30,20 +29,26 @@ export default async function Image() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: '#ffffff',
             padding: '60px 80px',
-            borderRadius: '24px',
-            border: '2px solid #e0e0e0',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
           }}
         >
+          {/* App icon/logo */}
+          <img
+            src="https://thehonestproject.co/metadata-photo.png"
+            width={120}
+            height={120}
+            style={{
+              borderRadius: '24px',
+              marginBottom: '32px',
+            }}
+          />
           <div
             style={{
-              fontSize: 72,
-              fontWeight: 900,
-              letterSpacing: '-0.05em',
-              color: '#1a1a1a',
-              marginBottom: '20px',
+              fontSize: 64,
+              fontWeight: 800,
+              letterSpacing: '-0.03em',
+              color: '#ffffff',
+              marginBottom: '16px',
               textAlign: 'center',
               lineHeight: 1.1,
             }}
@@ -52,58 +57,27 @@ export default async function Image() {
           </div>
           <div
             style={{
-              fontSize: 36,
-              color: '#6a6a6a',
+              fontSize: 28,
+              color: '#a0a0a0',
               textAlign: 'center',
-              maxWidth: '800px',
+              maxWidth: '700px',
               lineHeight: 1.4,
             }}
           >
-            A private-first journaling app for authentic self-reflection
+            Anonymous thoughts you never sent.
           </div>
           <div
             style={{
-              display: 'flex',
-              gap: '16px',
               marginTop: '40px',
+              padding: '14px 32px',
+              backgroundColor: '#ffffff',
+              color: '#1a1a1a',
+              borderRadius: '100px',
+              fontSize: 22,
+              fontWeight: 600,
             }}
           >
-            <div
-              style={{
-                padding: '12px 24px',
-                backgroundColor: '#E5F3FF',
-                color: '#1976d2',
-                borderRadius: '100px',
-                fontSize: 20,
-                fontWeight: 600,
-              }}
-            >
-              ✓ Still true
-            </div>
-            <div
-              style={{
-                padding: '12px 24px',
-                backgroundColor: '#E5FFE5',
-                color: '#2e7d32',
-                borderRadius: '100px',
-                fontSize: 20,
-                fontWeight: 600,
-              }}
-            >
-              🌱 I've grown
-            </div>
-            <div
-              style={{
-                padding: '12px 24px',
-                backgroundColor: '#FFF5E5',
-                color: '#ed6c02',
-                borderRadius: '100px',
-                fontSize: 20,
-                fontWeight: 600,
-              }}
-            >
-              🛡️ I was coping
-            </div>
+            thehonestproject.co
           </div>
         </div>
       </div>

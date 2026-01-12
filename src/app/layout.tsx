@@ -67,10 +67,10 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://thehonestproject.co',
     title: 'If I Was Honest | Anonymous Thoughts You Never Sent',
-    description: 'If I Was Honest is a collection of anonymous, unsent thoughts and confessions. Write honestly, publish anonymously, and read what others never said.',
+    description: 'A private-first journaling space for the things you never said.',
     siteName: 'If I Was Honest',
     images: [{
-      url: '/og-image.png',
+      url: 'https://thehonestproject.co/opengraph-image',
       width: 1200,
       height: 630,
       alt: 'If I Was Honest - Anonymous Thoughts You Never Sent'
@@ -79,8 +79,8 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'If I Was Honest | Anonymous Thoughts You Never Sent',
-    description: 'A collection of anonymous, unsent thoughts and confessions. Write honestly, publish anonymously, and read what others never said.',
-    images: ['/og-image.png'],
+    description: 'A private-first journaling space for the things you never said.',
+    images: ['https://thehonestproject.co/opengraph-image'],
     creator: '@ifiiwashonest'
   },
   robots: {
