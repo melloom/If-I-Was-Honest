@@ -60,37 +60,21 @@ export default function HomePage() {
   }, [showDisclaimer])
 
   const handleAccept = () => {
-    // Persist acceptance for this browser session only
+    // Persist acceptance permanently in localStorage
     try {
-      sessionStorage.setItem('disclaimer-accepted', 'true')
-      // Remove legacy localStorage flag to ensure per-session behavior
-      localStorage.removeItem('disclaimer-accepted')
-    } catch {}
+      localStorage.setItem('disclaimer-accepted', 'true')
+    } catch (error) {
+      console.error('Failed to save disclaimer acceptance:', error)
+    }
     setShowDisclaimer(false)
   }
 
   // Check localStorage after mount to prevent hydration mismatch
   useEffect(() => {
-    const syncFromStorage = () => {
-      if (typeof window === 'undefined') return
-      const accepted =
-        sessionStorage.getItem('disclaimer-accepted') ||
-        localStorage.getItem('disclaimer-accepted')
-      setShowDisclaimer(!accepted)
-    }
-
-    // Run immediately on mount to check if disclaimer was already accepted
-    syncFromStorage()
+    if (typeof window === 'undefined') return
     
-    // Also sync when returning via back/forward cache
-    window.addEventListener('pageshow', syncFromStorage)
-    window.addEventListener('focus', syncFromStorage)
-    document.addEventListener('visibilitychange', syncFromStorage)
-    return () => {
-      window.removeEventListener('pageshow', syncFromStorage)
-      window.removeEventListener('focus', syncFromStorage)
-      document.removeEventListener('visibilitychange', syncFromStorage)
-    }
+    const accepted = localStorage.getItem('disclaimer-accepted')
+    setShowDisclaimer(!accepted)
   }, [])
 
   return (

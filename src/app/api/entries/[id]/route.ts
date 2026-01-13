@@ -137,7 +137,7 @@ export async function PATCH(
     }
 
     // Validate status if provided
-    const validStatuses = ['STILL_TRUE', 'IVE_GROWN', 'I_WAS_COPING', 'I_LIED']
+    const validStatuses = ['NO_STATUS', 'STILL_TRUE', 'IVE_GROWN', 'I_WAS_COPING', 'I_LIED']
     if (status && !validStatuses.includes(status)) {
       return NextResponse.json(
         { error: 'Invalid status value' },

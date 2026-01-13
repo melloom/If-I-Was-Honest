@@ -25,6 +25,7 @@ interface PublishedEntry {
 
 // Status options for badge display
 const STATUS_OPTIONS = [
+  { value: 'NO_STATUS', label: 'No status', emoji: '—', color: '#F5F5F5', textColor: '#9e9e9e' },
   { value: 'STILL_TRUE', label: 'Still true', emoji: '✓', color: '#E5F3FF', textColor: '#1976d2' },
   { value: 'IVE_GROWN', label: "I've grown", emoji: '🌱', color: '#E5FFE5', textColor: '#2e7d32' },
   { value: 'I_WAS_COPING', label: 'I was coping', emoji: '🛡️', color: '#FFF5E5', textColor: '#ed6c02' },

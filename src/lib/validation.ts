@@ -47,17 +47,18 @@ export const entryTitleSchema = z
 
 // Entry status validation
 export const entryStatusSchema = z.enum([
+  'NO_STATUS',
   'STILL_TRUE',
-  'I_GREW',
+  'IVE_GROWN',
   'I_WAS_COPING',
-  'I_LIED_TO_MYSELF',
+  'I_LIED',
 ])
 
 // Create entry schema
 export const createEntrySchema = z.object({
   title: entryTitleSchema,
   content: entryContentSchema,
-  status: entryStatusSchema.default('STILL_TRUE'),
+  status: entryStatusSchema.default('NO_STATUS'),
   moodIds: z.array(z.string().uuid()).max(10).optional(),
   tagIds: z.array(z.string().uuid()).max(20).optional(),
 })

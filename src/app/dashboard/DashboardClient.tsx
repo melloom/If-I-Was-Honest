@@ -23,6 +23,7 @@ import { AppHeader } from '@/components/AppHeader'
 
 // Status options
 const STATUS_OPTIONS = [
+  { value: 'NO_STATUS', label: 'No status', emoji: '—', color: '#F5F5F5', textColor: '#9e9e9e' },
   { value: 'STILL_TRUE', label: 'Still true', emoji: '✓', color: '#E5F3FF', textColor: '#1976d2' },
   { value: 'IVE_GROWN', label: "I've grown", emoji: '🌱', color: '#E5FFE5', textColor: '#2e7d32' },
   { value: 'I_WAS_COPING', label: 'I was coping', emoji: '🛡️', color: '#FFF5E5', textColor: '#ed6c02' },
@@ -140,7 +141,7 @@ export default function DashboardClient() {
   // New entry form state
   const [newContent, setNewContent] = useState('')
   const [selectedMoods, setSelectedMoods] = useState<string[]>([])
-  const [selectedStatus, setSelectedStatus] = useState<EntryStatus>('STILL_TRUE')
+  const [selectedStatus, setSelectedStatus] = useState<EntryStatus>('NO_STATUS')
   const [shareAnonymously, setShareAnonymously] = useState(false)
   const [saving, setSaving] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false) // Extra safeguard
@@ -272,7 +273,7 @@ export default function DashboardClient() {
       // Reset form and close modal
       setNewContent('')
       setSelectedMoods([])
-      setSelectedStatus('STILL_TRUE')
+      setSelectedStatus('NO_STATUS')
       setShareAnonymously(settings.defaultShareAnonymously)
       setToField('')
       setFromField('')

@@ -73,7 +73,7 @@ export function useRealtimeEntries(
             id: doc.id,
             content: data.content || '',
             title: data.title || null,
-            status: data.status || 'STILL_TRUE',
+            status: data.status || 'NO_STATUS',
             createdAt,
             updatedAt,
             isPublished,

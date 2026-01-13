@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app'
-import { getAuth } from 'firebase/auth'
+import { getAuth, setPersistence, browserLocalPersistence } from 'firebase/auth'
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -9,6 +9,9 @@ const firebaseConfig = {
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 }
+
+let authInstance: ReturnType<typeof getAuth> | null = null
+let persistenceSet = false
 
 export function getFirebaseApp() {
   if (typeof window === 'undefined') {
@@ -24,7 +27,25 @@ export function getFirebaseAuth() {
   if (typeof window === 'undefined') {
     return null as any
   }
-  return getAuth(getFirebaseApp())
+  
+  // Return cached instance if already created
+  if (authInstance) {
+    return authInstance
+  }
+  
+  authInstance = getAuth(getFirebaseApp())
+  
+  // Set persistence to LOCAL for PWA compatibility (only once)
+  // This ensures auth state persists between browser and PWA sessions
+  if (!persistenceSet) {
+    persistenceSet = true
+    setPersistence(authInstance, browserLocalPersistence).catch((error) => {
+      console.error('[Firebase] Failed to set persistence:', error)
+      persistenceSet = false // Reset flag on error so it can retry
+    })
+  }
+  
+  return authInstance
 }
 
 // Backwards compatibility for existing imports in client components.

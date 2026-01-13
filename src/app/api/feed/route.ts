@@ -79,7 +79,7 @@ export async function GET(request: Request) {
       moods: entry.moods || [],
       tags: entry.tags || [],
       userId: entry.userId || null,
-      status: entry.status || 'STILL_TRUE',
+      status: entry.status || 'NO_STATUS',
     }))
 
     return NextResponse.json({

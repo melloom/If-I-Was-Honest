@@ -158,8 +158,8 @@ export async function POST(request: Request) {
     }
 
     // Validate status
-    const validStatuses = ['STILL_TRUE', 'IVE_GROWN', 'I_WAS_COPING', 'I_LIED']
-    const entryStatus = status && validStatuses.includes(status) ? status : 'STILL_TRUE'
+    const validStatuses = ['NO_STATUS', 'STILL_TRUE', 'IVE_GROWN', 'I_WAS_COPING', 'I_LIED']
+    const entryStatus = status && validStatuses.includes(status) ? status : 'NO_STATUS'
 
     const db = getServerFirestore()
     const now = new Date()
@@ -213,6 +213,7 @@ export async function POST(request: Request) {
         content: anonymizeForFeed(content),
         to: to ? sanitizePlainText(to) : null,
         from: from ? sanitizePlainText(from) : null,
+        status: entryStatus,
         moods: moodsArray,
         tags: tagsArray,
         publishedAt: now,
