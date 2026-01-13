@@ -223,8 +223,8 @@ export async function PATCH(
 }
 
 // DELETE - Soft or permanent delete an entry
-// RULE: Private posts can be deleted anytime, but permanent deletes are limited (e.g., 50 lifetime)
-// RULE: Public posts can only be deleted within 24 hours (max 50 lifetime deletions)
+// RULE: Private posts can be deleted anytime, but permanent deletes are limited (e.g., 10 lifetime)
+// RULE: Public posts can only be deleted within 24 hours (max 10 lifetime deletions)
 export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
@@ -270,7 +270,7 @@ export async function DELETE(
         const userDoc = await db.collection('users').doc(userId).get()
         const userData = userDoc.data()
         const permanentDeletions = userData?.permanentDeletions || 0
-        const permanentDeleteLimit = 50
+        const permanentDeleteLimit = 10
 
         if (permanentDeletions >= permanentDeleteLimit) {
           return NextResponse.json(
@@ -320,7 +320,7 @@ export async function DELETE(
             message:
               `This post has been live for ${Math.floor(hoursSincePublished)} hours and is now part of the community. ` +
               `It remains anonymous and helps others feel less alone.\n\n` +
-              `If you need to permanently remove this post, you can use one of your 50 permanent deletes. ` +
+              `If you need to permanently remove this post, you can use one of your 10 permanent deletes. ` +
               `This action is irreversible and should only be used if absolutely necessary.`,
             publishedAt: publishedAt.toISOString(),
             hoursSincePublished: Math.floor(hoursSincePublished),
@@ -335,13 +335,13 @@ export async function DELETE(
       const userData = userDoc.data()
       const deletionCount = userData?.publicPostDeletions || 0
 
-      if (deletionCount >= 50) {
+      if (deletionCount >= 10) {
         return NextResponse.json(
           {
             error: 'Deletion limit reached',
-            message: 'You have used all 50 lifetime public post deletions. This encourages thoughtful posting.',
+            message: 'You have used all 10 lifetime public post deletions. This encourages thoughtful posting.',
             deletionsUsed: deletionCount,
-            deletionsLimit: 50
+            deletionsLimit: 10
           },
           { status: 403 }
         )
@@ -373,7 +373,7 @@ export async function DELETE(
         success: true,
         message: 'Public post deleted successfully (within 24-hour window)',
         deletionsUsed: deletionCount2,
-        deletionsRemaining: 50 - deletionCount2
+        deletionsRemaining: 10 - deletionCount2
       })
     }
 
@@ -382,7 +382,7 @@ export async function DELETE(
     const userDoc = await db.collection('users').doc(userId).get()
     const userData = userDoc.data()
     const permanentDeletions = userData?.permanentDeletions || 0
-    const permanentDeleteLimit = 50
+    const permanentDeleteLimit = 10
 
     if (permanentDeletions >= permanentDeleteLimit) {
       return NextResponse.json(

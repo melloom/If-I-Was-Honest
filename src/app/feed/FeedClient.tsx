@@ -761,7 +761,7 @@ export default function FeedClient() {
                 for (let i = 0; i < ripCount; i++) {
                   const edgeHash = (absHash * (i + 1)) % 1000
                   const edge = edgeHash % 4 // 0=top, 1=right, 2=bottom, 3=left
-                  const position = 10 + (edgeHash % 80) // 10-90% along edge
+                  const position = 15 + (edgeHash % 70) // 15-85% along edge (safer boundaries)
                   const size = 15 + Math.floor(ripIntensity * 25) + (edgeHash % 15) // 15-55px based on age
                   const depth = 6 + Math.floor(ripIntensity * 10) + (edgeHash % 8) // 6-24px
                   rips.push({ edge, position, size, depth })
@@ -845,6 +845,7 @@ export default function FeedClient() {
                     border: '1px solid rgba(0, 0, 0, 0.08)',
                     borderRadius: '2px',
                     transform: isDesktop ? `rotate(${rotation}deg) translate(${offsetX}px, ${offsetY}px)` : 'none',
+                    overflow: 'hidden', // Ensure paper tears stay within card boundaries
                     // Add paper edge effect with slight irregularity
                     backgroundImage: `
                       linear-gradient(to right, rgba(0,0,0,0.03) 0%, transparent 1%, transparent 99%, rgba(0,0,0,0.03) 100%),

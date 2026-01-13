@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -8,32 +8,50 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const PWA_DISMISSED_KEY = 'pwa-install-dismissed'
+const PWA_INSTALLED_KEY = 'pwa-installed'
+const DISMISS_DURATION_DAYS = 7 // Don't show again for 7 days after dismissal
+
+function isDismissedRecently(): boolean {
+  if (typeof window === 'undefined') return true
+  
+  // Check if already installed
+  if (localStorage.getItem(PWA_INSTALLED_KEY) === 'true') return true
+  
+  const dismissedAt = localStorage.getItem(PWA_DISMISSED_KEY)
+  if (!dismissedAt) return false
+  
+  const dismissedTime = parseInt(dismissedAt, 10)
+  const now = Date.now()
+  const daysSinceDismissal = (now - dismissedTime) / (1000 * 60 * 60 * 24)
+  
+  return daysSinceDismissal < DISMISS_DURATION_DAYS
+}
 
 export function PWAInstall() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showPrompt, setShowPrompt] = useState(false)
 
-  useEffect(() => {
-    // Check if user already dismissed in this session
-    const isDismissed = sessionStorage.getItem(PWA_DISMISSED_KEY) === 'true'
+  const handleBeforeInstallPrompt = useCallback((e: Event) => {
+    e.preventDefault()
+    const beforeInstallPromptEvent = e as BeforeInstallPromptEvent
+    setDeferredPrompt(beforeInstallPromptEvent)
     
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault()
-      const beforeInstallPromptEvent = e as BeforeInstallPromptEvent
-      setDeferredPrompt(beforeInstallPromptEvent)
-      
-      // Only show if not dismissed in this session
-      if (!isDismissed) {
-        setShowPrompt(true)
-      }
+    // Only show if not dismissed recently
+    if (!isDismissedRecently()) {
+      setShowPrompt(true)
     }
+  }, [])
+
+  useEffect(() => {
+    // Don't set up listener if already dismissed recently
+    if (isDismissedRecently()) return
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
     }
-  }, [])
+  }, [handleBeforeInstallPrompt])
 
   const handleInstall = async () => {
     if (!deferredPrompt) return
@@ -44,6 +62,8 @@ export function PWAInstall() {
       
       if (outcome === 'accepted') {
         console.log('PWA installed successfully')
+        // Mark as installed so we never show the prompt again
+        localStorage.setItem(PWA_INSTALLED_KEY, 'true')
       }
       
       setDeferredPrompt(null)
@@ -54,8 +74,8 @@ export function PWAInstall() {
   }
 
   const handleDismiss = () => {
-    // Store dismissal in sessionStorage so it persists for this session only
-    sessionStorage.setItem(PWA_DISMISSED_KEY, 'true')
+    // Store dismissal timestamp in localStorage so it persists across sessions
+    localStorage.setItem(PWA_DISMISSED_KEY, Date.now().toString())
     setShowPrompt(false)
   }
 

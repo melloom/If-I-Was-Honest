@@ -25,7 +25,7 @@ export async function GET(request: Request) {
 
     const userData = userDoc.data()
     const deletionsUsed = userData?.publicPostDeletions || 0
-    const deletionsLimit = 50
+    const deletionsLimit = 10
     const deletionsRemaining = deletionsLimit - deletionsUsed
 
     return NextResponse.json({
