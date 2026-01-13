@@ -34,7 +34,7 @@ export function AppHeader() {
 
   // Check if native sharing is available
   useEffect(() => {
-    if (typeof window !== 'undefined' && navigator.share) {
+    if (typeof window !== 'undefined' && 'share' in navigator) {
       setCanShare(true)
     }
   }, [])
