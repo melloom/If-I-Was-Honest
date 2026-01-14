@@ -70,10 +70,21 @@ const computeTapePosition = (id: string, side: 'left' | 'right') => {
   for (let i = 0; i < id.length; i++) {
     hash = (id.charCodeAt(i) * (side === 'left' ? 17 : 23) + ((hash << 4) - hash)) | 0
   }
-  const location = Math.abs(hash) % 4
-  const position = 10 + (Math.abs(hash) % 21)
-  const rotation = ((Math.abs(hash) % 12) - 6)
-  const width = 18 + (Math.abs(hash) % 10)
+  const absHash = Math.abs(hash)
+  
+  // Ensure left tape is on top/left edges (0 or 2), right tape on bottom/right edges (1 or 3)
+  // This prevents tapes from overlapping or being too close
+  let location: number
+  if (side === 'left') {
+    location = absHash % 2 === 0 ? 0 : 2 // top (0) or left side (2)
+  } else {
+    location = absHash % 2 === 0 ? 1 : 3 // bottom (1) or right side (3)
+  }
+  
+  // Position along the edge - spread out more (15-35% range)
+  const position = 15 + (absHash % 21)
+  const rotation = ((absHash % 10) - 5) // -5 to +5 degrees
+  const width = 20 + (absHash % 8) // 20-28px
   return { position: `${position}%`, rotation, width, location }
 }
 
