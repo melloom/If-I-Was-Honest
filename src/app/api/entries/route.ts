@@ -85,7 +85,7 @@ export async function GET(request: Request) {
       id: entry.id,
       content: entry.content,
       title: entry.title || null,
-      status: entry.status || 'STILL_TRUE',
+      status: entry.status || 'NO_STATUS',
       createdAt: entry.createdAt?.toDate?.().toISOString() || new Date().toISOString(),
       updatedAt: entry.updatedAt?.toDate?.().toISOString() || new Date().toISOString(),
       isPublished: !!entry.publishedAt,

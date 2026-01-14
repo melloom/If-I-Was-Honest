@@ -995,81 +995,83 @@ export default function FeedClient() {
                     />
                   )}
 
-                  {/* Status badge */}
-                  <div
-                    className="absolute top-4 right-4 z-20"
-                  >
-                    {entry.userId === user?.uid ? (
-                      // User owns this entry - make status clickable with dropdown
-                      <div
-                        className="relative"
-                      >
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation() // Prevent modal from opening
-                            setStatusDropdownOpen(statusDropdownOpen === entry.id ? null : entry.id)
-                          }}
-                          className="text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1.5 transition-all hover:scale-105 hover:shadow-lg cursor-pointer"
+                  {/* Status badge - only show if status is not NO_STATUS */}
+                  {entry.status && entry.status !== 'NO_STATUS' && (
+                    <div
+                      className="absolute top-4 right-4 z-20"
+                    >
+                      {entry.userId === user?.uid ? (
+                        // User owns this entry - make status clickable with dropdown
+                        <div
+                          className="relative"
+                        >
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation() // Prevent modal from opening
+                              setStatusDropdownOpen(statusDropdownOpen === entry.id ? null : entry.id)
+                            }}
+                            className="text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1.5 transition-all hover:scale-105 hover:shadow-lg cursor-pointer"
+                            style={{ backgroundColor: statusOption.color, color: statusOption.textColor }}
+                            title="Click to change status"
+                          >
+                            <span>{statusOption.emoji}</span>
+                            {statusOption.label}
+                          </button>
+
+                          {/* Status dropdown menu */}
+                          {statusDropdownOpen === entry.id && (
+                            <div
+                              className="absolute right-0 top-full w-48 rounded-lg shadow-xl border overflow-hidden z-50"
+                              style={{ backgroundColor: '#FFFFFF', borderColor: '#E0E0E0' }}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {STATUS_OPTIONS.map((status) => (
+                                <button
+                                  key={status.value}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleStatusChange(entry.id, status.value)
+                                  }}
+                                  className="w-full px-4 py-2.5 text-left text-sm font-medium flex items-center gap-2 transition-all"
+                                  style={{
+                                    backgroundColor: entry.status === status.value ? status.color : '#FFFFFF',
+                                    color: entry.status === status.value ? status.textColor : '#4A4A4A',
+                                    opacity: entry.status === status.value ? 1 : 0.9
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    if (entry.status !== status.value) {
+                                      e.currentTarget.style.backgroundColor = '#F5F5F5'
+                                    }
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    if (entry.status !== status.value) {
+                                      e.currentTarget.style.backgroundColor = '#FFFFFF'
+                                    }
+                                  }}
+                                >
+                                  <span className="text-base">{status.emoji}</span>
+                                  <span>{status.label}</span>
+                                  {entry.status === status.value && (
+                                    <span className="ml-auto text-lg">✓</span>
+                                  )}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        // Not the owner - display only
+                        <span
+                          className="text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1.5"
                           style={{ backgroundColor: statusOption.color, color: statusOption.textColor }}
-                          title="Click to change status"
+                          title={statusOption.label}
                         >
                           <span>{statusOption.emoji}</span>
                           {statusOption.label}
-                        </button>
-
-                        {/* Status dropdown menu */}
-                        {statusDropdownOpen === entry.id && (
-                          <div
-                            className="absolute right-0 top-full w-48 rounded-lg shadow-xl border overflow-hidden z-50"
-                            style={{ backgroundColor: '#FFFFFF', borderColor: '#E0E0E0' }}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {STATUS_OPTIONS.map((status) => (
-                              <button
-                                key={status.value}
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  handleStatusChange(entry.id, status.value)
-                                }}
-                                className="w-full px-4 py-2.5 text-left text-sm font-medium flex items-center gap-2 transition-all"
-                                style={{
-                                  backgroundColor: entry.status === status.value ? status.color : '#FFFFFF',
-                                  color: entry.status === status.value ? status.textColor : '#4A4A4A',
-                                  opacity: entry.status === status.value ? 1 : 0.9
-                                }}
-                                onMouseEnter={(e) => {
-                                  if (entry.status !== status.value) {
-                                    e.currentTarget.style.backgroundColor = '#F5F5F5'
-                                  }
-                                }}
-                                onMouseLeave={(e) => {
-                                  if (entry.status !== status.value) {
-                                    e.currentTarget.style.backgroundColor = '#FFFFFF'
-                                  }
-                                }}
-                              >
-                                <span className="text-base">{status.emoji}</span>
-                                <span>{status.label}</span>
-                                {entry.status === status.value && (
-                                  <span className="ml-auto text-lg">✓</span>
-                                )}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      // Not the owner - display only
-                      <span
-                        className="text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1.5"
-                        style={{ backgroundColor: statusOption.color, color: statusOption.textColor }}
-                        title={statusOption.label}
-                      >
-                        <span>{statusOption.emoji}</span>
-                        {statusOption.label}
-                      </span>
-                    )}
-                  </div>
+                        </span>
+                      )}
+                    </div>
+                  )}
 
                   {/* Paper lighting - subtle gradient for depth and realism */}
                   <div

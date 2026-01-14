@@ -115,36 +115,6 @@ export async function PATCH(
       )
     }
 
-    // SECURITY: Rate limit status changes (prevent rapid switching)
-    if (status !== undefined && entryData?.status !== status) {
-      const lastStatusChange = entryData?.lastStatusChangeAt?.toDate?.()
-      if (lastStatusChange) {
-        const timeSinceLastChange = Date.now() - lastStatusChange.getTime()
-        const cooldownPeriod = 10 * 1000 // 10 seconds cooldown
-
-        if (timeSinceLastChange < cooldownPeriod) {
-          const remainingSeconds = Math.ceil((cooldownPeriod - timeSinceLastChange) / 1000)
-          return NextResponse.json(
-            {
-              error: 'Status change rate limit',
-              message: `Please wait ${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''} before changing status again`,
-              remainingSeconds
-            },
-            { status: 429 }
-          )
-        }
-      }
-    }
-
-    // Validate status if provided
-    const validStatuses = ['NO_STATUS', 'STILL_TRUE', 'IVE_GROWN', 'I_WAS_COPING', 'I_LIED']
-    if (status && !validStatuses.includes(status)) {
-      return NextResponse.json(
-        { error: 'Invalid status value' },
-        { status: 400 }
-      )
-    }
-
     // Build update data
     const updateData: any = {
       updatedAt: new Date(),

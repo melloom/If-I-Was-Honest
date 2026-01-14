@@ -228,12 +228,12 @@ export default function AboutPage() {
           </section>
 
           {/* Crisis Resources */}
-          <section className="bg-red-50 rounded-2xl p-8 md:p-10 border-2" style={{ borderColor: '#fecaca' }}>
-            <div className="flex items-start gap-4 mb-6">
+          <section className="bg-red-50 rounded-2xl p-8 md:p-10 border-2 overflow-hidden" style={{ borderColor: '#fecaca' }}>
+            <div className="flex items-start gap-4 flex-wrap mb-6">
               <svg className="w-8 h-8 flex-shrink-0" style={{ color: '#dc2626' }} fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
               </svg>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <h2 className="text-2xl font-bold mb-3" style={{ color: '#991b1b' }}>
                   Important: Crisis Resources
                 </h2>
@@ -244,7 +244,7 @@ export default function AboutPage() {
 
                 <div className="grid md:grid-cols-2 gap-6 mb-6">
                   {/* US Crisis Lines */}
-                  <div className="bg-white rounded-lg p-5 border" style={{ borderColor: '#fca5a5' }}>
+                  <div className="bg-white rounded-lg p-5 border min-w-0" style={{ borderColor: '#fca5a5' }}>
                     <h3 className="font-bold text-lg mb-3" style={{ color: '#991b1b' }}>
                       United States
                     </h3>
@@ -268,7 +268,7 @@ export default function AboutPage() {
                   </div>
 
                   {/* Specialized Resources */}
-                  <div className="bg-white rounded-lg p-5 border" style={{ borderColor: '#fca5a5' }}>
+                  <div className="bg-white rounded-lg p-5 border min-w-0" style={{ borderColor: '#fca5a5' }}>
                     <h3 className="font-bold text-lg mb-3" style={{ color: '#991b1b' }}>
                       Specialized Support
                     </h3>
@@ -297,24 +297,24 @@ export default function AboutPage() {
                 </div>
 
                 {/* International Resources */}
-                <div className="bg-white rounded-lg p-5 border" style={{ borderColor: '#fca5a5' }}>
+                <div className="bg-white rounded-lg p-5 border min-w-0" style={{ borderColor: '#fca5a5' }}>
                   <h3 className="font-bold text-lg mb-3" style={{ color: '#991b1b' }}>
                     International Resources
                   </h3>
                   <div className="space-y-2" style={{ color: '#7f1d1d', fontSize: '0.9375rem' }}>
-                    <div className="flex items-start gap-2">
+                    <div className="flex items-start gap-2 flex-wrap">
                       <span className="font-semibold min-w-fit">Canada:</span>
                       <span>Call 1-833-456-4566 or text 45645</span>
                     </div>
-                    <div className="flex items-start gap-2">
+                    <div className="flex items-start gap-2 flex-wrap">
                       <span className="font-semibold min-w-fit">UK:</span>
                       <span>Call 116 123 (Samaritans)</span>
                     </div>
-                    <div className="flex items-start gap-2">
+                    <div className="flex items-start gap-2 flex-wrap">
                       <span className="font-semibold min-w-fit">Australia:</span>
                       <span>Call 13 11 14 (Lifeline)</span>
                     </div>
-                    <div className="flex items-start gap-2">
+                    <div className="flex items-start gap-2 flex-wrap break-words">
                       <span className="font-semibold min-w-fit">Worldwide:</span>
                       <a href="https://findahelpline.com" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80 font-semibold">
                         FindAHelpline.com

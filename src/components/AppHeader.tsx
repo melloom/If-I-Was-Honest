@@ -7,7 +7,11 @@ import { signOut as firebaseSignOut } from 'firebase/auth'
 import { firebaseAuth } from '@/lib/firebase-client'
 import { useState, useEffect, useRef } from 'react'
 
-export function AppHeader() {
+type AppHeaderProps = {
+  onNavOpenChange?: (open: boolean) => void
+}
+
+export function AppHeader({ onNavOpenChange }: AppHeaderProps) {
   // Local state for firstName from settings
   const [firstName, setFirstName] = useState<string | null>(null)
   const [canShare, setCanShare] = useState(false)
@@ -60,6 +64,14 @@ export function AppHeader() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (!onNavOpenChange) return
+    onNavOpenChange(navOpen)
+    return () => {
+      onNavOpenChange(false)
+    }
+  }, [navOpen, onNavOpenChange])
 
   // Close menu on outside click
   useEffect(() => {

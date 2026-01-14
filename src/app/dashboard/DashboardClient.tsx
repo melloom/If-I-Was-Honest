@@ -30,8 +30,6 @@ const STATUS_OPTIONS = [
   { value: 'I_LIED', label: 'I lied to myself', emoji: '👁️', color: '#FFE5F5', textColor: '#9c27b0' },
 ] as const
 
-type EntryStatus = typeof STATUS_OPTIONS[number]['value']
-
 interface Entry {
   id: string
   content: string
@@ -125,7 +123,6 @@ export default function DashboardClient() {
   const [stats, setStats] = useState<Stats>({ total: 0, thisMonth: 0, shared: 0 })
   const [dayStreak, setDayStreak] = useState(0)
   const [filter, setFilter] = useState<'all' | 'private' | 'shared'>('all')
-  const [statusFilter, setStatusFilter] = useState<EntryStatus | 'all'>('all')
   const [isLoading, setIsLoading] = useState(true)
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement | null>(null)
@@ -141,7 +138,7 @@ export default function DashboardClient() {
   // New entry form state
   const [newContent, setNewContent] = useState('')
   const [selectedMoods, setSelectedMoods] = useState<string[]>([])
-  const [selectedStatus, setSelectedStatus] = useState<EntryStatus>('NO_STATUS')
+  const [selectedStatus, setSelectedStatus] = useState<'NO_STATUS' | 'STILL_TRUE' | 'IVE_GROWN' | 'I_WAS_COPING' | 'I_LIED'>('NO_STATUS')
   const [shareAnonymously, setShareAnonymously] = useState(false)
   const [saving, setSaving] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false) // Extra safeguard
@@ -301,71 +298,24 @@ export default function DashboardClient() {
     )
   }
 
-  const handleStatusChange = async (entryId: string, newStatus: EntryStatus) => {
+  const handleStatusChange = async (entryId: string, newStatus: string) => {
     try {
-      // Wait for token if not immediately available (retry up to 3 times)
-      let token = idToken
-      let retries = 0
-      while (!token && user && retries < 3) {
-        console.log(`[Dashboard] Token not ready, waiting... (attempt ${retries + 1}/3)`)
-        await new Promise(resolve => setTimeout(resolve, 500))
-
-        // Try to force refresh the token
-        if (user && !token) {
-          try {
-            const freshToken = await user.getIdToken(true)
-            token = freshToken
-            console.log('[Dashboard] Force refreshed token')
-          } catch (e) {
-            console.error('[Dashboard] Token refresh failed:', e)
-          }
-        } else {
-          token = idToken
-        }
-        retries++
-      }
-
-      if (!token) {
-        console.error('[Dashboard] No auth token available after retries')
-        setErrorMessage('Authentication failed. Please refresh the page and try again.')
-        return
-      }
-
-      console.log('[Dashboard] Updating status:', { entryId, newStatus, hasToken: !!token })
-
       const response = await fetch(`/api/entries/${entryId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          ...(idToken ? { Authorization: `Bearer ${idToken}` } : {})
         },
         body: JSON.stringify({ status: newStatus }),
       })
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        const errorMessage = errorData.message || errorData.error || 'Failed to update status'
-
-        // Show user-friendly error message
-        if (response.status === 429) {
-          setErrorMessage(errorMessage)
-        } else if (response.status === 401) {
-          setErrorMessage('Authentication expired. Please refresh the page.')
-        } else {
-          setErrorMessage(errorMessage)
-        }
-
-        // Use console.warn for expected rate limits, console.error for real errors
-        if (response.status === 429) {
-          console.warn('Status change rate limited:', errorMessage)
-        } else {
-          console.error('Status update failed:', errorMessage)
-        }
-        return
+        throw new Error(errorData.message || errorData.error || 'Failed to update status')
       }
 
+      setStatusDropdownOpen(null)
       // Real-time listener will automatically update the entries
-      console.log('[Dashboard] Status updated successfully')
     } catch (error) {
       console.error('Error updating status:', error)
       setErrorMessage('Failed to update status. Please try again.')
@@ -837,44 +787,10 @@ export default function DashboardClient() {
                     </div>
                   </div>
 
-                  {/* Status Filter */}
-                  <div>
-                    <label className="block text-sm font-medium mb-2" style={{ color: '#4a4a4a' }}>
-                      Filter by reflection
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      <button
-                        onClick={() => setStatusFilter('all')}
-                        className="px-3 py-1.5 rounded-full text-xs font-medium transition-all"
-                        style={{
-                          backgroundColor: statusFilter === 'all' ? '#2c2c2c' : '#f5f5f5',
-                          color: statusFilter === 'all' ? '#ffffff' : '#6a6a6a',
-                        }}
-                      >
-                        All
-                      </button>
-                      {STATUS_OPTIONS.map((status) => (
-                        <button
-                          key={status.value}
-                          onClick={() => setStatusFilter(status.value)}
-                          className="px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5"
-                          style={{
-                            backgroundColor: statusFilter === status.value ? status.color : '#f5f5f5',
-                            color: statusFilter === status.value ? status.textColor : '#6a6a6a',
-                          }}
-                        >
-                          <span>{status.emoji}</span>
-                          {status.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
                   {/* Clear Filters */}
                   <div className="flex justify-between items-center pt-2 border-t" style={{ borderColor: '#e0e0e0' }}>
                     <div className="text-sm" style={{ color: '#6a6a6a' }}>
                       {entries.filter((entry) => {
-                        if (statusFilter !== 'all' && entry.status !== statusFilter) return false
                         if (searchQuery) {
                           const query = searchQuery.toLowerCase()
                           const matchesContent = entry.content.toLowerCase().includes(query)
@@ -908,7 +824,6 @@ export default function DashboardClient() {
                         setSearchQuery('')
                         setSelectedMoodFilters([])
                         setDateRange({ start: '', end: '' })
-                        setStatusFilter('all')
                         setSortBy('newest'
                         )
                       }}
@@ -962,7 +877,6 @@ export default function DashboardClient() {
                     return true
                   })
                   .filter((entry) => {
-                    if (statusFilter !== 'all' && entry.status !== statusFilter) return false;
                     if (searchQuery) {
                       const query = searchQuery.toLowerCase();
                       const matchesContent = entry.content.toLowerCase().includes(query);
@@ -1090,7 +1004,6 @@ export default function DashboardClient() {
                                       onClick={(e) => {
                                         e.stopPropagation()
                                         handleStatusChange(entry.id, status.value)
-                                        setStatusDropdownOpen(null)
                                       }}
                                       className={`w-full px-3 py-2 text-left text-xs font-medium hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg flex items-center gap-2 ${entry.status === status.value ? 'bg-gray-100' : ''}`}
                                       style={{ color: status.textColor }}
@@ -1174,11 +1087,24 @@ export default function DashboardClient() {
                           {/* Actions bar */}
                           <div className={entry.isPublished ? (isMobile ? 'flex gap-1 pt-1.5 border-t border-gray-100 mt-auto' : 'flex gap-2 pt-2 border-t border-gray-100 mt-auto') : (isMobile ? 'flex gap-2 pt-2 border-t w-full' : 'flex gap-3 pt-3 sm:pt-4 border-t w-full')}
                             style={entry.isPublished ? { borderColor: '#f0f0f0' } : { borderColor: '#f0f0f0' }}>
+                            {/* Make Public button - only for private entries */}
+                            {!entry.isPublished && (
+                              <button
+                                onClick={e => { e.stopPropagation(); handlePublishEntry(entry.id, entry.moods.map(m => m.name)); }}
+                                className={isMobile ? 'flex-1 px-2 py-1 rounded-md text-xs font-semibold transition-all hover:opacity-90 flex items-center justify-center gap-1' : 'flex-1 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all hover:opacity-90 flex items-center justify-center gap-2'}
+                                style={{ backgroundColor: '#e5f3ff', color: '#1976d2', border: '1px solid #90caf9', minWidth: 0 }}
+                              >
+                                <svg className={isMobile ? 'w-3 h-3' : 'w-4 h-4'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                </svg>
+                                Make Public
+                              </button>
+                            )}
                             <button
                               onClick={e => { e.stopPropagation(); handleDeleteEntry(entry.id, entry.isPublished, entry.publishedAt); }}
                               className={entry.isPublished
                                 ? (isMobile ? 'flex-1 px-2 py-1 rounded-md text-[10px] font-semibold transition-all hover:opacity-90 flex items-center justify-center gap-1 bg-red-50 text-red-700 border border-red-200' : 'flex-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:opacity-90 flex items-center justify-center gap-2 bg-red-50 text-red-700 border border-red-200')
-                                : (isMobile ? 'w-full px-2 py-1 rounded-md text-xs font-semibold transition-all hover:opacity-90 flex items-center justify-center gap-1' : 'w-full px-3 py-1.5 rounded-lg text-sm font-semibold transition-all hover:opacity-90 flex items-center justify-center gap-2')}
+                                : (isMobile ? 'flex-1 px-2 py-1 rounded-md text-xs font-semibold transition-all hover:opacity-90 flex items-center justify-center gap-1' : 'flex-1 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all hover:opacity-90 flex items-center justify-center gap-2')}
                               style={entry.isPublished
                                 ? { minWidth: 0 }
                                 : { backgroundColor: '#fff5f5', color: '#d32f2f', border: '1px solid #ffcdd2', minWidth: 0 }}
@@ -1598,10 +1524,18 @@ export default function DashboardClient() {
           <div className="max-w-md w-full rounded-xl bg-white p-8 shadow-2xl border" style={{ borderColor: '#e0e0e0' }}>
             <div className="space-y-4">
               <div className="text-xl font-semibold" style={{ color: '#2a2a2a' }}>
-                Share Anonymously?
+                Make Entry Public?
               </div>
-              <div className="text-sm" style={{ color: '#6a6a6a' }}>
-                Share this entry anonymously to the public feed? It will be visible to everyone but your identity will remain private.
+              <div className="text-sm leading-relaxed space-y-2" style={{ color: '#6a6a6a' }}>
+                <p>
+                  This will share your entry anonymously on the public feed where everyone can see it.
+                </p>
+                <p className="font-semibold" style={{ color: '#d32f2f' }}>
+                  ⚠️ Once public, this entry cannot be made private again.
+                </p>
+                <p className="text-xs" style={{ color: '#8a8a8a' }}>
+                  You can still edit the content after publishing, and you'll have 24 hours to delete it if needed.
+                </p>
               </div>
               <div className="flex gap-3 pt-2">
                 <button
@@ -1612,7 +1546,7 @@ export default function DashboardClient() {
                     executePublish(publishConfirmModal.entryId, publishConfirmModal.moods)
                   }}
                 >
-                  Share
+                  Make Public
                 </button>
                 <button
                   className="px-4 py-2 rounded-lg font-medium transition-all hover:opacity-90"
