@@ -249,18 +249,6 @@ export function AppHeader({ onNavOpenChange }: AppHeaderProps) {
                   >
                     Settings
                   </Link>
-                  {canShare && (
-                    <button
-                      onClick={() => {
-                        setMenuOpen(false)
-                        handleShare()
-                      }}
-                      className="px-4 py-3 text-left text-sm hover:bg-gray-100"
-                      style={{ color: '#2a2a2a' }}
-                    >
-                      Share Site
-                    </button>
-                  )}
                   <button
                     onClick={async () => {
                       setMenuOpen(false)

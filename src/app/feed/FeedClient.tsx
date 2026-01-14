@@ -78,6 +78,7 @@ export default function FeedClient() {
   const [isDesktop, setIsDesktop] = useState(false)
   const [statusDropdownOpen, setStatusDropdownOpen] = useState<string | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [isNavOpen, setIsNavOpen] = useState(false)
   
   // Refs for stable references
   const currentPageRef = useRef(currentPage)
@@ -504,7 +505,7 @@ export default function FeedClient() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#FAF8F3' }}>
-      <AppHeader />
+      <AppHeader onNavOpenChange={setIsNavOpen} />
 
       {/* Feed Header Section */}
       <div className="max-w-4xl mx-auto px-4 py-6 border-b" style={{ borderColor: '#E8E4DC' }}>
@@ -781,12 +782,22 @@ export default function FeedClient() {
         )}
       </main>
 
-      {/* Floating Action Button - Only for authenticated users */}
+      {/* Floating Action Button - Only for authenticated users, hidden when nav menu is open */}
       {user && (
         <button
-          onClick={() => setShowWriteModal(true)}
-          className="fixed bottom-8 left-1/2 -translate-x-1/2 px-8 py-4 rounded-full flex items-center gap-3 shadow-xl transition-all hover:scale-105 z-50 font-semibold text-base"
-          style={{ backgroundColor: '#1A1A1A', color: '#FFFFFF' }}
+          onClick={() => !isNavOpen && setShowWriteModal(true)}
+          disabled={isNavOpen}
+          aria-hidden={isNavOpen}
+          className={`fixed bottom-8 left-1/2 -translate-x-1/2 px-8 py-4 rounded-full flex items-center gap-3 shadow-xl transition-all font-semibold text-base ${
+            isNavOpen 
+              ? 'opacity-0 pointer-events-none scale-95' 
+              : 'hover:scale-105 z-50'
+          }`}
+          style={{ 
+            backgroundColor: isNavOpen ? '#9B9B9B' : '#1A1A1A', 
+            color: '#FFFFFF',
+            zIndex: isNavOpen ? 30 : 50
+          }}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
