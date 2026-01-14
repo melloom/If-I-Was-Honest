@@ -154,7 +154,7 @@ export default function PrivacyPage() {
               <li><strong>Opt-Out:</strong> Unsubscribe from non-essential communications</li>
             </ul>
             <p className="mt-4">
-              To exercise these rights, email us at privacy@ifiwashonest.com
+              To exercise these rights, email us at contact@mellowsites.com
             </p>
           </section>
 
@@ -244,7 +244,7 @@ export default function PrivacyPage() {
             </h2>
             <p>
               For privacy-related questions or to exercise your rights, contact us at:<br />
-              <strong>Email:</strong> privacy@ifiwashonest.com
+              <strong>Email:</strong> contact@mellowsites.com
             </p>
           </section>
 
