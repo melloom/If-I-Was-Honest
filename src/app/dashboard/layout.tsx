@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Private Journal Dashboard — Incognito & Secure',
     description: 'Access your private, incognito journal in a privacy-first space. No tracking, no social.',
-    url: 'https://ifiiwashonest.com/dashboard',
+    url: 'https://thehonestproject.co/dashboard',
     type: 'website'
   },
   robots: {

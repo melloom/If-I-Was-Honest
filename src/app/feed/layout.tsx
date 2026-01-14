@@ -17,8 +17,19 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Anonymous Feed - Read Honest Thoughts From Real People',
     description: 'A judgment-free space where people share their honest thoughts anonymously. See you\'re not alone.',
-    url: 'https://ifiiwashonest.com/feed',
+    url: 'https://thehonestproject.co/feed',
     type: 'website'
+  },
+  alternates: {
+    canonical: 'https://thehonestproject.co/feed'
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true
+    }
   }
 }
 

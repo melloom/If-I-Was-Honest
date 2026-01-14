@@ -16,8 +16,19 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Terms & Conditions - TheHonestProject',
     description: 'Legal terms and conditions for using TheHonestProject.',
-    url: 'https://ifiiwashonest.com/terms',
+    url: 'https://thehonestproject.co/terms',
     type: 'website'
+  },
+  alternates: {
+    canonical: 'https://thehonestproject.co/terms'
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true
+    }
   }
 }
 

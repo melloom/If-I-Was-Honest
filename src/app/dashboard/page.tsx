@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'My Journal - TheHonestProject',
     description: 'Your private space for honest thoughts and reflections.',
-    url: 'https://ifiiwashonest.com/dashboard',
+    url: 'https://thehonestproject.co/dashboard',
     type: 'website'
   }
 }

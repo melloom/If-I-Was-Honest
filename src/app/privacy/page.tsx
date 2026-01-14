@@ -18,8 +18,19 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Privacy Policy - TheHonestProject',
     description: 'Privacy-first anonymous journaling. Learn how we keep your thoughts secure.',
-    url: 'https://ifiiwashonest.com/privacy',
+    url: 'https://thehonestproject.co/privacy',
     type: 'website'
+  },
+  alternates: {
+    canonical: 'https://thehonestproject.co/privacy'
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true
+    }
   }
 }
 

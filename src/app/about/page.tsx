@@ -8,6 +8,24 @@ export const metadata: Metadata = {
   title: 'About TheHonestProject | Anonymous Thoughts & Unsent Messages',
   description: 'TheHonestProject (If I Was Honest) - A safe space for anonymous confessions, unsent messages, and honest thoughts you never said. Write what you truly feel without judgment.',
   keywords: ['anonymous confessions', 'unsent messages', 'honest thoughts', 'private journal', 'mental health', 'anonymous thoughts', 'things i never said', 'confession app', 'honest feelings', 'emotional healing', 'therapy journal', 'anonymous writing', 'secret thoughts', 'unspoken words', 'mental wellness', 'self reflection'],
+  openGraph: {
+    title: 'About TheHonestProject - Anonymous Thoughts & Unsent Messages',
+    description: 'A safe space for anonymous confessions and honest thoughts you never said.',
+    url: 'https://thehonestproject.co/about',
+    type: 'website',
+    siteName: 'TheHonestProject'
+  },
+  alternates: {
+    canonical: 'https://thehonestproject.co/about'
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true
+    }
+  }
 }
 
 export default function AboutPage() {

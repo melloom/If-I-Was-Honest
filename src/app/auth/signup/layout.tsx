@@ -15,8 +15,19 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Sign Up Free - Start Your Journaling Journey',
     description: 'Create your free account and begin authentic self-reflection today.',
-    url: 'https://ifiiwashonest.com/auth/signup',
+    url: 'https://thehonestproject.co/auth/signup',
     type: 'website'
+  },
+  alternates: {
+    canonical: 'https://thehonestproject.co/auth/signup'
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true
+    }
   }
 }
 

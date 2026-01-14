@@ -21,8 +21,19 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Anonymous Feed - TheHonestProject',
     description: 'Read anonymous confessions and unsent messages from people around the world.',
-    url: 'https://ifiiwashonest.com/feed',
+    url: 'https://thehonestproject.co/feed',
     type: 'website'
+  },
+  alternates: {
+    canonical: 'https://thehonestproject.co/feed'
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true
+    }
   }
 }
 
