@@ -77,6 +77,7 @@ export default function FeedClient() {
   const fullText = "If I was honest..."
   const [isDesktop, setIsDesktop] = useState(false)
   const [statusDropdownOpen, setStatusDropdownOpen] = useState<string | null>(null)
+  const [isTransitioning, setIsTransitioning] = useState(false)
   
   // Refs for stable references
   const currentPageRef = useRef(currentPage)
@@ -262,9 +263,16 @@ export default function FeedClient() {
     return () => clearInterval(interval)
   }, [fetchEntries])
 
-  // Memoized page change handler
+  // Memoized page change handler with smooth transition
   const handlePageChange = useCallback((page: number) => {
-    fetchEntries(page)
+    setIsTransitioning(true)
+    // Small delay to allow fade-out before fetching
+    setTimeout(() => {
+      fetchEntries(page).finally(() => {
+        // Fade back in after content loads
+        setTimeout(() => setIsTransitioning(false), 50)
+      })
+    }, 150)
   }, [fetchEntries])
 
   const totalPages = useMemo(() => Math.ceil(totalCount / postsPerPage), [totalCount, postsPerPage])
@@ -687,7 +695,10 @@ export default function FeedClient() {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 items-start"
             style={{ 
               contentVisibility: 'auto',
-              containIntrinsicSize: '0 500px'
+              containIntrinsicSize: '0 500px',
+              opacity: isTransitioning ? 0 : 1,
+              transform: isTransitioning ? 'translateY(10px)' : 'translateY(0)',
+              transition: 'opacity 200ms ease-out, transform 200ms ease-out'
             }}
           >
             {entries.map((entry) => (

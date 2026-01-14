@@ -229,7 +229,7 @@ const FeedCard = memo(function FeedCard({
 
       {/* Status badge - only show if status is not NO_STATUS */}
       {entry.status && entry.status !== 'NO_STATUS' && (
-        <div className="absolute bottom-4 right-4 z-20">
+        <div className="absolute bottom-4 left-4 z-20">
           {entry.userId === userId ? (
             <div className="relative">
               <button
@@ -247,7 +247,7 @@ const FeedCard = memo(function FeedCard({
 
               {statusDropdownOpen === entry.id && (
                 <div
-                  className="absolute right-0 top-full w-48 rounded-lg shadow-xl border overflow-hidden z-50"
+                  className="absolute left-0 top-full w-48 rounded-lg shadow-xl border overflow-hidden z-50"
                   style={{ backgroundColor: '#FFFFFF', borderColor: '#E0E0E0' }}
                   onClick={(e) => e.stopPropagation()}
                 >
