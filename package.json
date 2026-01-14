@@ -10,7 +10,8 @@
     "lint": "next lint",
     "deploy:rules": "node scripts/deployFirestoreRules.js ./thehonestproject-e49c5-firebase-adminsdk-fbsvc-e032695b76.json ./firestore.rules",
     "deploy:indexes": "node scripts/deployFirestoreIndexes.js",
-    "deploy:firestore": "npm run deploy:rules && npm run deploy:indexes"
+    "deploy:firestore": "npm run deploy:rules && npm run deploy:indexes",
+    "push": "git add . && git commit -m \"Update\" && git push"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

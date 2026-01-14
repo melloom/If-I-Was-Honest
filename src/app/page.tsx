@@ -11,22 +11,31 @@ export default function HomePage() {
   const router = useRouter()
   const { user } = useFirebaseAuth()
   
-  // Redirect authenticated users to feed
-  useEffect(() => {
-    if (user) {
-      router.push('/feed')
-    }
-  }, [user, router])
-  
-  // Initialize to true (show disclaimer) on both server and client to prevent hydration mismatch
-  // Will be updated in useEffect after mount to check localStorage
+  // Always start with true to avoid hydration mismatch
   const [showDisclaimer, setShowDisclaimer] = useState(true)
+  const [mounted, setMounted] = useState(false)
   const [typedText, setTypedText] = useState('')
   const fullText = "If I was honest..."
+  
+  // Check localStorage after mount
+  useEffect(() => {
+    setMounted(true)
+    const accepted = localStorage.getItem('disclaimer-accepted')
+    if (accepted) {
+      setShowDisclaimer(false)
+    }
+  }, [])
+  
+  // Redirect authenticated users to feed (but only after they've accepted the disclaimer)
+  useEffect(() => {
+    if (user && !showDisclaimer && mounted) {
+      router.push('/feed')
+    }
+  }, [user, showDisclaimer, mounted, router])
 
   // Typing animation effect - continuous loop
   useEffect(() => {
-    if (showDisclaimer) return
+    if (showDisclaimer || !mounted) return
 
     let currentIndex = 0
     let isDeleting = false
@@ -57,25 +66,19 @@ export default function HomePage() {
     }, isDeleting ? 50 : 100)
 
     return () => clearInterval(typingInterval)
-  }, [showDisclaimer])
+  }, [showDisclaimer, mounted])
 
   const handleAccept = () => {
     // Persist acceptance permanently in localStorage
     try {
       localStorage.setItem('disclaimer-accepted', 'true')
+      setShowDisclaimer(false)
     } catch (error) {
       console.error('Failed to save disclaimer acceptance:', error)
+      // Still hide the disclaimer even if localStorage fails
+      setShowDisclaimer(false)
     }
-    setShowDisclaimer(false)
   }
-
-  // Check localStorage after mount to prevent hydration mismatch
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    
-    const accepted = localStorage.getItem('disclaimer-accepted')
-    setShowDisclaimer(!accepted)
-  }, [])
 
   return (
     <>
@@ -99,8 +102,8 @@ export default function HomePage() {
 
       <Header />
 
-      {/* Age Gate / Disclaimer Modal */}
-      {showDisclaimer && (
+      {/* Age Gate / Disclaimer Modal - only render when mounted */}
+      {mounted && showDisclaimer && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.95)' }}>
           <div className="max-w-lg w-full p-8 rounded-lg" style={{ backgroundColor: '#ffffff' }}>
             <h2 className="text-2xl font-bold mb-4" style={{ color: '#1a1a1a' }}>
