@@ -229,7 +229,7 @@ const FeedCard = memo(function FeedCard({
 
       {/* Status badge - only show if status is not NO_STATUS */}
       {entry.status && entry.status !== 'NO_STATUS' && (
-        <div className="absolute top-4 right-4 z-20">
+        <div className="absolute bottom-4 right-4 z-20">
           {entry.userId === userId ? (
             <div className="relative">
               <button
@@ -341,23 +341,23 @@ const FeedCard = memo(function FeedCard({
         <div className="mb-4">
           {/* To and From fields */}
           {(entry.to || entry.from) && (
-            <div className="space-y-1 mb-2 pr-20">
+            <div className="space-y-1 mb-2">
               {entry.to && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-start gap-2">
                   <span className="text-xs font-medium uppercase tracking-wide flex-shrink-0" style={{ color: '#9B9B9B' }}>
                     To:
                   </span>
-                  <span className="text-sm font-semibold truncate" style={{ color: '#1A1A1A' }}>
+                  <span className="text-sm font-semibold break-words" style={{ color: '#1A1A1A' }}>
                     {entry.to}
                   </span>
                 </div>
               )}
               {entry.from && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-start gap-2">
                   <span className="text-xs font-medium uppercase tracking-wide flex-shrink-0" style={{ color: '#9B9B9B' }}>
                     From:
                   </span>
-                  <span className="text-sm font-semibold truncate" style={{ color: '#1A1A1A' }}>
+                  <span className="text-sm font-semibold break-words" style={{ color: '#1A1A1A' }}>
                     {entry.from}
                   </span>
                 </div>
