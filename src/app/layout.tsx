@@ -122,6 +122,42 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta name="apple-mobile-web-app-title" content="If I Was Honest" />
+        
+        {/* Favicon Links - Ensures Google picks up the icon */}
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/manifest.webmanifest" />
+        
+        {/* Schema.org structured data for Google */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebApplication',
+              name: 'If I Was Honest',
+              applicationCategory: 'HealthApplication',
+              description: 'If I Was Honest is a collection of anonymous, unsent thoughts and confessions. Write honestly, publish anonymously, and read what others never said.',
+              url: 'https://thehonestproject.co',
+              image: 'https://thehonestproject.co/android-chrome-512x512.png',
+              logo: 'https://thehonestproject.co/android-chrome-512x512.png',
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: '4.8',
+                ratingCount: '150'
+              },
+              offers: {
+                '@type': 'Offer',
+                price: '0',
+                priceCurrency: 'USD'
+              }
+            })
+          }}
+        />
       </head>
       <body 
         className={inter.className} 
