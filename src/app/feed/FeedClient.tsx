@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useFirebaseAuth } from '@/components/FirebaseAuthProvider'
@@ -8,6 +8,7 @@ import { signOut as firebaseSignOut } from 'firebase/auth'
 import { firebaseAuth } from '@/lib/firebase-client'
 import { AppHeader } from '@/components/AppHeader'
 import { ErrorToast } from '@/components/ErrorToast'
+import FeedCard from '@/components/FeedCard'
 
 interface PublishedEntry {
   id: string
@@ -75,7 +76,11 @@ export default function FeedClient() {
   const [typedText, setTypedText] = useState('')
   const fullText = "If I was honest..."
   const [isDesktop, setIsDesktop] = useState(false)
-  const [statusDropdownOpen, setStatusDropdownOpen] = useState<string | null>(null) // Track which entry's dropdown is open
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState<string | null>(null)
+  
+  // Refs for stable references
+  const currentPageRef = useRef(currentPage)
+  currentPageRef.current = currentPage
 
   // Set mounted to true after component mounts (client-side only)
   useEffect(() => {
@@ -165,10 +170,14 @@ export default function FeedClient() {
     return () => document.removeEventListener('click', handleClickOutside)
   }, [statusDropdownOpen])
 
-  const fetchEntries = async (page: number = 1) => {
+  // Memoized fetch function
+  const fetchEntries = useCallback(async (page: number = 1, isBackground = false) => {
     console.log('[Feed] Fetching public feed entries for page', page)
     try {
-      setLoading(true)
+      // Only show loading state for non-background fetches
+      if (!isBackground) {
+        setLoading(true)
+      }
       const offset = (page - 1) * postsPerPage
       const params = new URLSearchParams({
         limit: postsPerPage.toString(),
@@ -219,55 +228,62 @@ export default function FeedClient() {
       setHasMore(data.hasMore)
       setCurrentPage(page)
 
-      // Scroll to top when changing pages
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      // Scroll to top when changing pages (not for background refresh)
+      if (!isBackground) {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }
       } catch (error) {
       console.error('Error fetching feed:', error)
       const errorMsg = error instanceof Error ? error.message : 'Failed to fetch feed'
-      setErrorMessage(errorMsg)
+      if (!isBackground) {
+        setErrorMessage(errorMsg)
+      }
     } finally {
-      setLoading(false)
+      if (!isBackground) {
+        setLoading(false)
+      }
     }
-  }
+  }, [selectedMood, searchQuery, idToken, postsPerPage])
 
   // Fetch entries (public, no auth required)
   useEffect(() => {
     console.log('[Feed] useEffect triggered - fetching public feed')
     setCurrentPage(1)
     fetchEntries(1)
-  }, [selectedMood, searchQuery])
+  }, [fetchEntries])
 
-  // Auto-refresh feed every 30 seconds
+  // Auto-refresh feed every 60 seconds (increased from 30s for better performance)
   useEffect(() => {
     const interval = setInterval(() => {
-      console.log('[Feed] Auto-refreshing feed')
-      fetchEntries(currentPage)
-    }, 30000) // 30 seconds
+      console.log('[Feed] Auto-refreshing feed (background)')
+      fetchEntries(currentPageRef.current, true)
+    }, 60000) // 60 seconds - reduced frequency
 
     return () => clearInterval(interval)
-  }, [selectedMood, searchQuery, currentPage])
+  }, [fetchEntries])
 
-  const handlePageChange = (page: number) => {
+  // Memoized page change handler
+  const handlePageChange = useCallback((page: number) => {
     fetchEntries(page)
-  }
+  }, [fetchEntries])
 
-  const totalPages = Math.ceil(totalCount / postsPerPage)
+  const totalPages = useMemo(() => Math.ceil(totalCount / postsPerPage), [totalCount, postsPerPage])
 
   // Check if entry can be deleted (within 24 hours of publishing)
-  const canDeleteEntry = (publishedAt: string) => {
+  const canDeleteEntry = useCallback((publishedAt: string) => {
     const published = new Date(publishedAt)
     const now = new Date()
     const hoursSincePublished = (now.getTime() - published.getTime()) / (1000 * 60 * 60)
     return hoursSincePublished < 24
-  }
+  }, [])
 
   // Delete published entry - show confirmation modal
-  const handleDeletePublishedEntry = (entryId: string) => {
+  const handleDeletePublishedEntry = useCallback((entryId: string) => {
     setDeleteConfirmModal({ show: true, entryId })
-  }
+  }, [])
 
   // Execute delete after confirmation
-  const executeDeletePublishedEntry = async (entryId: string) => {
+  const executeDeletePublishedEntry = useCallback(async (entryId: string) => {
     try {
       const response = await fetch(`/api/feed/${entryId}`, {
         method: 'DELETE',
@@ -286,10 +302,10 @@ export default function FeedClient() {
       setErrorMessage('Failed to delete entry. Please try again.')
       setDeleteConfirmModal(null)
     }
-  }
+  }, [idToken, fetchEntries])
 
-  // Handle status change for owned entries
-  const handleStatusChange = async (entryId: string, newStatus: string) => {
+  // Handle status change for owned entries - memoized
+  const handleStatusChange = useCallback(async (entryId: string, newStatus: string) => {
     try {
       // Wait for token if not immediately available (retry up to 3 times)
       let token = idToken
@@ -363,7 +379,16 @@ export default function FeedClient() {
       setErrorMessage(errorMsg)
       setTimeout(() => setErrorMessage(null), 5000)
     }
-  }
+  }, [idToken, user])
+
+  // Memoized handlers for FeedCard
+  const handleCardClick = useCallback((entry: PublishedEntry) => {
+    setSelectedEntry(entry)
+  }, [])
+
+  const handleStatusDropdownToggle = useCallback((entryId: string | null) => {
+    setStatusDropdownOpen(entryId)
+  }, [])
 
   // Generate consistent pastel color from entry ID
   const getCardColor = (entryId: string) => {
