@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, FormEvent, ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
@@ -14,7 +14,7 @@ export default function SignUpPage() {
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError('')
 
@@ -92,7 +92,7 @@ export default function SignUpPage() {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                 required
                 className="w-full px-4 h-12 rounded-lg focus:outline-none focus:ring-2 transition-all"
                 style={{ backgroundColor: '#FAF8F3', border: '1px solid #E8E4DC', color: '#1A1A1A' }}
@@ -110,7 +110,7 @@ export default function SignUpPage() {
                 id="password"
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                 required
                 minLength={8}
                 className="w-full px-4 h-12 rounded-lg focus:outline-none focus:ring-2 transition-all"
@@ -131,7 +131,7 @@ export default function SignUpPage() {
                 id="confirmPassword"
                 type="password"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
                 required
                 minLength={8}
                 className="w-full px-4 h-12 rounded-lg focus:outline-none focus:ring-2 transition-all"
