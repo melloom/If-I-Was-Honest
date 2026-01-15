@@ -23,17 +23,6 @@ export const metadata: Metadata = {
     description: 'Your private space for honest thoughts and reflections.',
     url: 'https://thehonestproject.co/dashboard',
     type: 'website'
-  },
-  alternates: {
-    canonical: 'https://thehonestproject.co/dashboard'
-  },
-  robots: {
-    index: false,
-    follow: true,
-    googleBot: {
-      index: false,
-      follow: true
-    }
   }
 }
 

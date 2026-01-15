@@ -13,11 +13,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Account Settings - Control Your Privacy & Security',
     description: 'Manage privacy settings, security preferences, and customize your journaling experience.',
-    url: 'https://thehonestproject.co/settings',
-    type: 'website'
-  },
-  alternates: {
-    canonical: 'https://thehonestproject.co/settings'
+    url: 'https://thehonestproject.co/settings'
   },
   robots: {
     index: false,

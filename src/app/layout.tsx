@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   publisher: 'If I Was Honest',
   metadataBase: new URL('https://thehonestproject.co'),
   alternates: {
-    canonical: 'https://thehonestproject.co/'
+    canonical: '/'
   },
   appleWebApp: {
     capable: true,
@@ -129,10 +129,8 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
         <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png" />
-        <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.webmanifest" />
-        <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
         
         {/* Schema.org structured data for Google */}
         <script

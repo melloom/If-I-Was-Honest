@@ -212,7 +212,7 @@ export default function TermsPage() {
             <ul className="list-disc pl-6 space-y-2 mt-2">
               <li><strong>988 Suicide & Crisis Lifeline (US):</strong> Call or text 988</li>
               <li><strong>Crisis Text Line:</strong> Text "HOME" to 741741</li>
-              <li><strong>International:</strong> Visit <a href="https://findahelpline.com" target="_blank" rel="nofollow noopener noreferrer" className="underline text-blue-600">findahelpline.com</a></li>
+              <li><strong>International:</strong> Visit <a href="https://findahelpline.com" className="underline text-blue-600">findahelpline.com</a></li>
             </ul>
             <p className="mt-4">
               If you or someone you know is in immediate danger, call emergency services (911 in the US).

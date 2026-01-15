@@ -2,42 +2,41 @@ import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://thehonestproject.co'
-  const now = new Date()
 
   return [
     {
-      url: `${baseUrl}/`,
-      lastModified: now,
+      url: baseUrl,
+      lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1,
     },
     {
       url: `${baseUrl}/feed`,
-      lastModified: now,
+      lastModified: new Date(),
       changeFrequency: 'hourly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/about`,
-      lastModified: now,
+      lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/auth/signup`,
-      lastModified: now,
+      lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/privacy`,
-      lastModified: now,
+      lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.5,
     },
     {
       url: `${baseUrl}/terms`,
-      lastModified: now,
+      lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.5,
     },
