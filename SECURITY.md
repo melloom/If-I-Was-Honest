@@ -18,7 +18,7 @@
 - **SameSite Cookies**: Cookies set with SameSite=Lax
 - **Origin Validation**: Requests validated against allowed origins
 
-### 4. **Rate Limiting** ✅
+### 4. **Rate Limiting** ✅^
 - **Auth Endpoints**: 5 attempts per 15 minutes
 - **Signup**: 3 signups per hour per IP
 - **API Routes**: 100 requests per minute
