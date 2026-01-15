@@ -10,6 +10,15 @@ export const metadata: Metadata = {
     'private journal login',
     'mental health app login'
   ],
+  openGraph: {
+    title: 'Sign In - If I Was Honest',
+    description: 'Access your private journal and continue your self-reflection journey.',
+    url: 'https://thehonestproject.co/auth/signin',
+    type: 'website'
+  },
+  alternates: {
+    canonical: 'https://thehonestproject.co/auth/signin'
+  },
   robots: {
     index: false,
     follow: true,

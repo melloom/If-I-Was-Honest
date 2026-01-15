@@ -176,7 +176,7 @@ export default function AboutPage() {
                 <a
                   href="https://theunsentproject.com"
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener noreferrer nofollow"
                   className="font-semibold hover:underline transition-opacity hover:opacity-70"
                   style={{ color: '#2c2c2c' }}
                 >
@@ -219,7 +219,7 @@ export default function AboutPage() {
                   <a
                     href="https://github.com/melloom"
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel="noopener noreferrer nofollow"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all hover:opacity-80"
                     style={{ backgroundColor: '#2c2c2c', color: '#ffffff' }}
                   >
@@ -231,7 +231,7 @@ export default function AboutPage() {
                   <a
                     href="https://github.com/melloom/If-I-Was-Honest"
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel="noopener noreferrer nofollow"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all hover:opacity-80"
                     style={{ backgroundColor: '#f5f5f5', color: '#2a2a2a', border: '1px solid #e0e0e0' }}
                   >
@@ -334,7 +334,7 @@ export default function AboutPage() {
                     </div>
                     <div className="flex items-start gap-2 flex-wrap break-words">
                       <span className="font-semibold min-w-fit">Worldwide:</span>
-                      <a href="https://findahelpline.com" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80 font-semibold">
+                      <a href="https://findahelpline.com" target="_blank" rel="noopener noreferrer nofollow" className="underline hover:opacity-80 font-semibold">
                         FindAHelpline.com
                       </a>
                       <span>- Crisis lines in 30+ countries</span>

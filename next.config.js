@@ -46,8 +46,40 @@ const nextConfig = {
   reactStrictMode: true,
   // Add empty turbopack config to silence Next.js 16 warning about webpack config from next-pwa
   turbopack: {},
+  // Target modern browsers to reduce legacy JavaScript
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  // Output modern ES2020 to eliminate unnecessary polyfills
+  swcMinify: true,
+  modularizeImports: {
+    firebase: {
+      transform: 'firebase/{{member}}',
+    },
+  },
   images: {
     domains: [],
+  },
+  experimental: {
+    optimizePackageImports: ['@firebase/auth', '@firebase/firestore', 'firebase'],
+  },
+  webpack: (config, { isServer }) => {
+    // Better chunk splitting for Firebase
+    if (!isServer) {
+      config.optimization.splitChunks = {
+        ...config.optimization.splitChunks,
+        cacheGroups: {
+          ...config.optimization.splitChunks?.cacheGroups,
+          firebase: {
+            test: /[\\/]node_modules[\\/](firebase|@firebase)[\\/]/,
+            name: 'firebase',
+            priority: 10,
+            reuseExistingChunk: true,
+          },
+        },
+      };
+    }
+    return config;
   },
   // Security headers via response headers instead of deprecated middleware
   async headers() {

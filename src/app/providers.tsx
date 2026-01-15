@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useState, useEffect } from 'react'
-import { FirebaseAuthProvider } from '@/components/FirebaseAuthProvider'
+import { LazyFirebaseAuth } from '@/components/LazyFirebaseAuth'
 import { PWAInstall } from '@/components/PWAInstall'
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -208,11 +208,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <FirebaseAuthProvider>
+    <LazyFirebaseAuth>
       <QueryClientProvider client={queryClient}>
         {children}
         <PWAInstall />
       </QueryClientProvider>
-    </FirebaseAuthProvider>
+    </LazyFirebaseAuth>
   )
 }

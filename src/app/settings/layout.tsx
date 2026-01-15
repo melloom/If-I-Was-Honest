@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     description: 'Manage privacy settings, security preferences, and customize your journaling experience.',
     url: 'https://thehonestproject.co/settings'
   },
+  alternates: {
+    canonical: 'https://thehonestproject.co/settings'
+  },
   robots: {
     index: false,
     follow: false

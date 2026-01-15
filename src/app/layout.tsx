@@ -3,7 +3,12 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 
-const inter = Inter({ subsets: ['latin'], preload: false, display: 'swap' })
+const inter = Inter({ 
+  subsets: ['latin'], 
+  display: 'swap',
+  preload: true,
+  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Arial', 'sans-serif']
+})
 
 export const metadata: Metadata = {
   title: {
@@ -37,7 +42,7 @@ export const metadata: Metadata = {
   publisher: 'If I Was Honest',
   metadataBase: new URL('https://thehonestproject.co'),
   alternates: {
-    canonical: '/'
+    canonical: 'https://thehonestproject.co/'
   },
   appleWebApp: {
     capable: true,
@@ -116,6 +121,15 @@ export default function RootLayout({
       }}
     >
       <head>
+        {/* Sitemap for search engines */}
+        <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+        
+        {/* DNS Prefetch and Preconnect for performance */}
+        <link rel="preconnect" href="https://thehonestproject-e49c5.firebaseapp.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://apis.google.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
+        <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com" />
+        
         <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5, user-scalable=yes" />
         <meta name="theme-color" content="#FAF8F3" />
         <meta name="mobile-web-app-capable" content="yes" />
@@ -124,6 +138,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="If I Was Honest" />
         
         {/* Favicon Links - Ensures Google picks up the icon */}
+        <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
