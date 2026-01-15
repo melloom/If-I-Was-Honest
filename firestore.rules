@@ -1,0 +1,79 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null && request.auth.uid != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Users: one document per uid
+    match /users/{userId} {
+      allow read, create, update, delete: if isOwner(userId);
+    }
+
+    // Entries: container doc per user, with subcollection 'entries'
+    match /entries/{userId} {
+      // Container doc access limited to owner
+      allow read, create, update, delete: if isOwner(userId);
+
+      // Subcollection: allow real-time read/write for owner, including permanent delete
+      match /entries/{entryId} {
+        allow read, write, delete: if isOwner(userId);
+      }
+    }
+
+    function isValidEntryWrite() {
+      // Ensure ownership and restrict allowed fields
+      return request.resource.data.userId == request.auth.uid
+        && request.resource.data.keys().hasOnly([
+          'userId', 'title', 'content', 'status',
+          'createdAt', 'updatedAt', 'deletedAt',
+          'publishedAt', 'publishedEntryId', 'timeLockUntil', 'metadata'
+        ])
+        && (request.resource.data.content == null || request.resource.data.content is string)
+        && (request.resource.data.title == null || request.resource.data.title is string)
+        && (request.resource.data.status == null || request.resource.data.status is string);
+    }
+
+    // User moods: container doc per user, with subcollection 'moods'
+    match /user_moods/{userId} {
+      allow read, create, update, delete: if isOwner(userId);
+
+      match /moods/{moodId} {
+        allow read, create, update, delete: if isOwner(userId);
+      }
+    }
+
+    // User tags: container doc per user, with subcollection 'tags'
+    match /user_tags/{userId} {
+      allow read, create, update, delete: if isOwner(userId);
+
+      match /tags/{tagId} {
+        allow read, create, update, delete: if isOwner(userId);
+      }
+    }
+
+    // Published entries: public read, owner-only writes and permanent delete
+    match /published_entries/{publishedEntryId} {
+      // Feed is private; require auth even for reads
+      allow read: if isSignedIn();
+
+      // Allow clients to create/update/delete only their own published entries
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasOnly(['userId','content','publishedAt','deletedAt','metadata'])
+        && request.resource.data.userId == request.auth.uid;
+
+      // Allow update or permanent delete if owner
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
